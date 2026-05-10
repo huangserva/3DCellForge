@@ -28,20 +28,20 @@ import plantCellRender from './assets/cell-plant-render.png'
 import './App.css'
 
 const CELL_TYPES = [
-  { id: 'plant', name: 'Plant Cell', type: 'Eukaryotic Cell', accent: '#82b366' },
-  { id: 'white-blood', name: 'White Blood Cell', type: 'Immune Cell', accent: '#7e6edb' },
-  { id: 'neuron', name: 'Neuron', type: 'Nerve Cell', accent: '#8b5cf6' },
-  { id: 'epithelial', name: 'Epithelial Cell', type: 'Human Tissue Cell', accent: '#e07a7a' },
-  { id: 'bacteria', name: 'Bacteria Cell', type: 'Prokaryotic Cell', accent: '#5fbf9f' },
-  { id: 'animal', name: 'Animal Cell', type: 'Eukaryotic Cell', accent: '#459ccf' },
-  { id: 'muscle', name: 'Muscle Cell', type: 'Muscle Fiber', accent: '#d25762' },
+  { id: 'plant', name: '植物细胞', type: '真核细胞', accent: '#82b366' },
+  { id: 'white-blood', name: '白细胞', type: '免疫细胞', accent: '#7e6edb' },
+  { id: 'neuron', name: '神经元', type: '神经细胞', accent: '#8b5cf6' },
+  { id: 'epithelial', name: '上皮细胞', type: '人体组织细胞', accent: '#e07a7a' },
+  { id: 'bacteria', name: '细菌细胞', type: '原核细胞', accent: '#5fbf9f' },
+  { id: 'animal', name: '动物细胞', type: '真核细胞', accent: '#459ccf' },
+  { id: 'muscle', name: '肌肉细胞', type: '肌肉纤维', accent: '#d25762' },
 ]
 
 const SEEDED_GENERATED_CELLS = [
   {
     id: 'tripo-epithelial-test',
-    name: 'Tripo Epithelial Test',
-    type: 'AI Generated Epithelial Cell',
+    name: 'Tripo 上皮细胞测试模型',
+    type: 'AI 生成上皮细胞',
     accent: '#e07a7a',
     custom: true,
     template: 'epithelial',
@@ -52,13 +52,13 @@ const SEEDED_GENERATED_CELLS = [
       taskId: 'dc44beb1-e1a1-4650-9337-fbe418b7b154',
       modelUrl: '/generated-models/tripo-epithelial-cell-test.glb',
       rawModelUrl: '',
-      message: 'Cached GLB from the verified Tripo epithelial test run.',
+      message: '已缓存通过验证的 Tripo 上皮细胞测试 GLB。',
     },
   },
   {
     id: 'tripo-plant-test',
-    name: 'Tripo Plant Test',
-    type: 'AI Generated Plant Cell',
+    name: 'Tripo 植物细胞测试模型',
+    type: 'AI 生成植物细胞',
     accent: '#82b366',
     custom: true,
     template: 'plant',
@@ -69,60 +69,60 @@ const SEEDED_GENERATED_CELLS = [
       taskId: '1db80a91-e202-4494-b17b-147de74cae81',
       modelUrl: '/generated-models/tripo-plant-cell-test.glb',
       rawModelUrl: '',
-      message: 'Cached GLB from the verified Tripo test run.',
+      message: '已缓存通过验证的 Tripo 测试 GLB。',
     },
   },
 ]
 
 const ORGANELLES = {
   nucleus: {
-    label: 'Nucleus',
-    title: 'Nucleus',
-    subtitle: 'Genetic control region',
-    size: 'About 6-10 um',
-    location: 'Central cytoplasm',
-    visible: 'Yes, stained purple',
-    note: 'White blood cells use a lobed nucleus to move through tight tissue spaces while coordinating immune response genes.',
+    label: '细胞核',
+    title: '细胞核',
+    subtitle: '遗传控制区域',
+    size: '约 6-10 um',
+    location: '细胞质中央',
+    visible: '是，染色后呈紫色',
+    note: '白细胞通过分叶状细胞核穿过狭窄组织空间，同时协调免疫响应相关基因。',
     accent: '#7b4bb4',
   },
   lysosome: {
-    label: 'Lysosome',
-    title: 'Lysosome',
-    subtitle: 'The cellular cleanup crew',
-    size: 'About 1-2 um',
-    location: 'Blood, lymph, and tissues',
-    visible: 'Yes, especially with stain',
-    note: 'Lysosomes contain enzymes that digest captured material and damaged cell components.',
+    label: '溶酶体',
+    title: '溶酶体',
+    subtitle: '细胞内清理结构',
+    size: '约 1-2 um',
+    location: '血液、淋巴和组织',
+    visible: '是，染色后更明显',
+    note: '溶酶体含有可分解捕获物质和受损细胞组件的酶。',
     accent: '#8d58b8',
   },
   mitochondria: {
-    label: 'Mitochondria',
-    title: 'Mitochondria',
-    subtitle: 'ATP production sites',
-    size: 'About 0.5-1 um',
-    location: 'Cytoplasm',
-    visible: 'Often with fluorescent dye',
-    note: 'Immune cells change mitochondrial activity as they activate, migrate, and respond to infection.',
+    label: '线粒体',
+    title: '线粒体',
+    subtitle: 'ATP 生成位置',
+    size: '约 0.5-1 um',
+    location: '细胞质',
+    visible: '常需荧光染料辅助观察',
+    note: '免疫细胞在激活、迁移和响应感染时会调整线粒体活性。',
     accent: '#df7046',
   },
   membrane: {
-    label: 'Plasma Membrane',
-    title: 'Plasma Membrane',
-    subtitle: 'Selective outer boundary',
-    size: 'About 7-10 nm',
-    location: 'Cell perimeter',
-    visible: 'Indirectly visible',
-    note: 'The membrane receives immune signals and allows the cell to squeeze through tissue barriers.',
+    label: '细胞膜',
+    title: '细胞膜',
+    subtitle: '选择性外边界',
+    size: '约 7-10 nm',
+    location: '细胞外围',
+    visible: '可间接观察',
+    note: '细胞膜接收免疫信号，并帮助细胞挤过组织屏障。',
     accent: '#7aa4bf',
   },
   granules: {
-    label: 'Secretory Granules',
-    title: 'Secretory Granules',
-    subtitle: 'Immune response packets',
-    size: 'About 0.1-1 um',
-    location: 'Cytoplasm',
-    visible: 'Yes, as colored dots',
-    note: 'Granules store proteins and signaling molecules released during immune defense.',
+    label: '分泌颗粒',
+    title: '分泌颗粒',
+    subtitle: '免疫响应颗粒',
+    size: '约 0.1-1 um',
+    location: '细胞质',
+    visible: '是，表现为彩色点状结构',
+    note: '颗粒储存免疫防御过程中释放的蛋白质和信号分子。',
     accent: '#5b82c4',
   },
 }
@@ -130,67 +130,86 @@ const ORGANELLES = {
 const ORGANELLE_ORDER = ['nucleus', 'lysosome', 'mitochondria', 'membrane', 'granules']
 
 const MICROSCOPE_IMAGES = [
-  { label: 'Light Microscope', tone: 'light', note: 'Bright-field texture and tissue context.' },
-  { label: 'Stained Selection', tone: 'purple', note: 'Contrast-enhanced organelle staining.' },
-  { label: 'Electron Microscope', tone: 'mono', note: 'High-detail grayscale surface scan.' },
+  { label: '光学显微镜', tone: 'light', note: '明场纹理与组织环境参考。' },
+  { label: '染色视图', tone: 'purple', note: '增强对比的细胞器染色参考。' },
+  { label: '电子显微镜', tone: 'mono', note: '高细节灰度表面扫描参考。' },
 ]
 
 const WORKSPACE_PANELS = {
-  Gallery: 'Saved render angles, microscope snapshots, and exported study plates.',
-  Library: 'Reference structures for cell walls, membranes, nuclei, lysosomes, and mitochondria.',
-  Notebooks: 'Observation notes linked to the selected cell and organelle.',
-  Settings: 'Viewer quality, labels, cross-section defaults, and export preferences.',
-  Compare: 'Side-by-side cell comparison for visual structure and biological role.',
-  Profile: 'Current workspace: Bio Visualization Prototype.',
+  Gallery: '已保存的渲染角度、显微快照和导出记录。',
+  Library: '细胞壁、细胞膜、细胞核、溶酶体和线粒体等参考结构。',
+  Notebooks: '与当前细胞和细胞器关联的观察笔记。',
+  Settings: '查看器质量、标签、剖面视图和导出偏好。',
+  Compare: '并排对比细胞结构与生物学角色。',
+  Profile: '当前项目：AI 3D 模型工坊中文体验版。',
+}
+
+const PANEL_LABELS = {
+  Gallery: '图库',
+  Library: '结构库',
+  Notebooks: '观察笔记',
+  Settings: '设置',
+  Compare: '对比',
+  Profile: '当前项目',
+}
+
+const CELL_PROMPT_NAMES = {
+  plant: 'Plant Cell',
+  'white-blood': 'White Blood Cell',
+  neuron: 'Neuron',
+  epithelial: 'Epithelial Cell',
+  bacteria: 'Bacteria Cell',
+  animal: 'Animal Cell',
+  muscle: 'Muscle Cell',
 }
 
 const CELL_PROFILES = {
   plant: {
-    summary: 'Rigid wall, large vacuole, chloroplast-like structures, Golgi stacks, and a clear nucleus.',
-    occurs: 'Leaves, stems, roots, and photosynthetic tissue.',
-    comparison: 'Has a rigid wall and chloroplast-like organelles; animal cells do not.',
+    summary: '具有坚硬细胞壁、大液泡、类叶绿体结构、高尔基体堆叠和清晰细胞核。',
+    occurs: '叶、茎、根和光合作用组织。',
+    comparison: '植物细胞具有坚硬细胞壁和类叶绿体结构，动物细胞没有这些特征。',
     compareTarget: 'animal',
     organelles: ['membrane', 'nucleus', 'mitochondria', 'granules'],
   },
   'white-blood': {
-    summary: 'Soft immune cell with lobed nucleus, many lysosomes, granules, and deformable membrane.',
-    occurs: 'Blood, lymph, and inflamed tissue.',
-    comparison: 'More mobile and granular than epithelial cells; built for immune response.',
+    summary: '柔软的免疫细胞，具有分叶状细胞核、较多溶酶体、颗粒和可变形细胞膜。',
+    occurs: '血液、淋巴和炎症组织。',
+    comparison: '相比上皮细胞，白细胞更易移动且颗粒更多，适合免疫响应。',
     compareTarget: 'epithelial',
     organelles: ['lysosome', 'nucleus', 'mitochondria', 'membrane', 'granules'],
   },
   neuron: {
-    summary: 'Compact soma with branching dendrite and axon-like extensions for signal routing.',
-    occurs: 'Brain, spinal cord, and peripheral nerves.',
-    comparison: 'Long membrane extensions dominate the shape; most other cells stay compact.',
+    summary: '紧凑胞体带有树突和轴突样延伸结构，用于传递信号。',
+    occurs: '大脑、脊髓和周围神经。',
+    comparison: '神经元以长距离膜延伸结构为主要形态，多数其他细胞更紧凑。',
     compareTarget: 'muscle',
     organelles: ['membrane', 'nucleus', 'mitochondria', 'granules'],
   },
   epithelial: {
-    summary: 'Sheet-like tissue cell with apical ridges, junction cues, membrane boundaries, and nucleus.',
-    occurs: 'Skin, ducts, organ linings, and protective surfaces.',
-    comparison: 'Designed for barrier tissue, unlike free-moving white blood cells.',
+    summary: '片状组织细胞，带有顶端脊线、连接提示、膜边界和细胞核。',
+    occurs: '皮肤、导管、器官内衬和保护性表面。',
+    comparison: '上皮细胞用于形成屏障组织，不同于可自由移动的白细胞。',
     compareTarget: 'white-blood',
     organelles: ['membrane', 'nucleus', 'mitochondria', 'granules'],
   },
   bacteria: {
-    summary: 'Prokaryotic capsule with nucleoid DNA, ribosome dots, pili, and a flagellum cue.',
-    occurs: 'Soil, water, gut flora, skin, and many environmental surfaces.',
-    comparison: 'No nucleus or membrane-bound organelles; the DNA sits in a nucleoid region.',
+    summary: '原核胶囊样结构，包含拟核 DNA、核糖体点、菌毛和鞭毛提示。',
+    occurs: '土壤、水、肠道菌群、皮肤以及多种环境表面。',
+    comparison: '没有细胞核和膜包裹细胞器，DNA 位于拟核区域。',
     compareTarget: 'animal',
     organelles: ['membrane', 'granules'],
   },
   animal: {
-    summary: 'Flexible eukaryotic cell with nucleus, mitochondria, vesicles, and soft membrane.',
-    occurs: 'Organs, connective tissue, blood-related tissues, and cultured samples.',
-    comparison: 'Lacks the rigid wall shown in plant cells.',
+    summary: '柔性的真核细胞，包含细胞核、线粒体、囊泡和柔软细胞膜。',
+    occurs: '器官、结缔组织、血液相关组织和培养样本。',
+    comparison: '动物细胞没有植物细胞展示的坚硬细胞壁。',
     compareTarget: 'plant',
     organelles: ['membrane', 'nucleus', 'mitochondria', 'lysosome', 'granules'],
   },
   muscle: {
-    summary: 'Elongated fiber-like cell with striation cues and extra mitochondria for contraction.',
-    occurs: 'Skeletal muscle, cardiac tissue, and contractile tissue samples.',
-    comparison: 'Elongated and energy-heavy compared with round animal cells.',
+    summary: '细长纤维状细胞，带有横纹提示和用于收缩的更多线粒体。',
+    occurs: '骨骼肌、心肌组织和收缩性组织样本。',
+    comparison: '相比圆形动物细胞，肌肉细胞更细长且能量需求更高。',
     compareTarget: 'neuron',
     organelles: ['membrane', 'nucleus', 'mitochondria', 'granules'],
   },
@@ -210,9 +229,9 @@ const MODEL_API_BASE = import.meta.env.VITE_MODEL_API_BASE || import.meta.env.VI
 const GENERATION_POLL_INTERVAL_MS = 3500
 const GENERATION_TIMEOUT_MS = 8 * 60 * 1000
 const GENERATION_PROVIDER_OPTIONS = [
-  { id: 'auto', label: 'Auto', description: 'Tripo first, Hunyuan backup.' },
-  { id: 'tripo', label: 'Tripo', description: 'Cloud generation.' },
-  { id: 'hunyuan', label: 'Hunyuan', description: 'Local Hunyuan3D server.' },
+  { id: 'auto', label: '自动', description: '优先使用 Tripo，失败后尝试 Hunyuan。' },
+  { id: 'tripo', label: 'Tripo', description: '云端生成。' },
+  { id: 'hunyuan', label: 'Hunyuan', description: '本地 Hunyuan3D 服务。' },
 ]
 const GENERATION_PROVIDER_IDS = new Set(GENERATION_PROVIDER_OPTIONS.map((provider) => provider.id))
 
@@ -236,78 +255,78 @@ const DEFAULT_ORGANELLE_BY_CELL = {
 const CELL_DETAIL_OVERRIDES = {
   plant: {
     nucleus: {
-      subtitle: 'The command center',
-      size: '5-10 um in diameter',
-      location: 'Usually central',
-      visible: 'Yes',
-      note: 'The nucleus is surrounded by a double membrane called the nuclear envelope, which contains pores that regulate the movement of molecules in and out.',
-      funFact: 'The nucleus was one of the first cell structures discovered.',
+      subtitle: '细胞指挥中心',
+      size: '直径 5-10 um',
+      location: '通常位于中央',
+      visible: '是',
+      note: '细胞核被称为核膜的双层膜包围，核膜上的孔道调控分子进出。',
+      funFact: '细胞核是最早被发现的细胞结构之一。',
     },
     membrane: {
-      title: 'Cell Wall',
-      subtitle: 'Rigid outer support',
-      size: 'About 0.1-10 um thick',
-      location: 'Outer boundary',
-      visible: 'Yes',
-      note: 'Plant cells have a rigid wall outside the membrane. It gives the cell shape and helps resist pressure from the large central vacuole.',
-      funFact: 'Cellulose fibers make plant cell walls strong and flexible.',
+      title: '细胞壁',
+      subtitle: '坚硬外部支撑',
+      size: '厚约 0.1-10 um',
+      location: '外部边界',
+      visible: '是',
+      note: '植物细胞在细胞膜外侧有坚硬细胞壁，可维持形状并抵抗大型中央液泡带来的压力。',
+      funFact: '纤维素纤维让植物细胞壁兼具强度和柔韧性。',
     },
     mitochondria: {
-      note: 'Mitochondria convert stored sugars into usable energy for growth, repair, and transport inside the plant cell.',
-      funFact: 'Plant cells have both mitochondria and chloroplasts.',
+      note: '线粒体将储存的糖转化为可用能量，用于植物细胞的生长、修复和胞内运输。',
+      funFact: '植物细胞同时具有线粒体和叶绿体。',
     },
     granules: {
-      title: 'Golgi Apparatus',
-      subtitle: 'Packaging and transport',
-      note: 'The Golgi modifies, sorts, and packages proteins and lipids before they move to their next destination.',
-      funFact: 'Golgi stacks look like folded ribbons in many educational renders.',
+      title: '高尔基体',
+      subtitle: '包装与运输',
+      note: '高尔基体会修饰、分拣并包装蛋白质和脂质，再将其送往下一目的地。',
+      funFact: '在许多教学渲染中，高尔基体堆叠看起来像折叠的丝带。',
     },
   },
   'white-blood': {
     lysosome: {
-      note: 'White blood cells carry many lysosomes because they digest captured particles and damaged material during immune response.',
-      funFact: 'The clustered purple granules are emphasized here so they remain readable while rotating.',
+      note: '白细胞含有较多溶酶体，因为它们需要在免疫响应中消化捕获颗粒和受损物质。',
+      funFact: '这里强化了成簇紫色颗粒，方便旋转观察时保持可读性。',
     },
     nucleus: {
-      note: 'The lobed nucleus is a key visual feature of many immune cells and helps the cell deform through narrow tissue gaps.',
+      note: '分叶状细胞核是许多免疫细胞的重要视觉特征，也帮助细胞变形并穿过狭窄组织间隙。',
     },
   },
   neuron: {
     membrane: {
-      title: 'Axon and Dendrites',
-      subtitle: 'Signal-routing branches',
-      location: 'Extending from the soma',
-      note: 'Neurons depend on long membrane extensions to receive and transmit electrical signals across large distances.',
-      funFact: 'The branching structure matters more visually than a perfectly round cell body.',
+      title: '轴突与树突',
+      subtitle: '信号传导分支',
+      location: '从胞体向外延伸',
+      note: '神经元依靠较长的膜延伸结构在远距离接收和传递电信号。',
+      funFact: '对神经元而言，分支结构在视觉识别上比完全球形胞体更重要。',
     },
   },
   epithelial: {
     membrane: {
-      title: 'Apical Surface',
-      subtitle: 'Barrier and contact layer',
-      location: 'Tissue-facing edge',
-      note: 'Epithelial cells form sheets. The surface ridges and junction lines make that tissue architecture visible.',
+      title: '顶端表面',
+      subtitle: '屏障与接触层',
+      location: '面向组织表面的一侧',
+      note: '上皮细胞形成片层结构。表面脊线和连接线让这种组织架构更直观。',
     },
   },
   bacteria: {
     granules: {
-      title: 'Nucleoid and Ribosomes',
-      subtitle: 'Prokaryotic core material',
-      size: 'Not membrane bound',
-      location: 'Central cytoplasm',
-      note: 'Bacteria do not have a nucleus. The blue DNA coil and small ribosome dots represent the prokaryotic interior.',
-      funFact: 'The flagellum and pili are exaggerated for readability in the 3D viewer.',
+      title: '拟核与核糖体',
+      subtitle: '原核核心物质',
+      size: '无膜包裹',
+      location: '中央细胞质',
+      note: '细菌没有细胞核。蓝色 DNA 线圈和小型核糖体点代表原核细胞内部结构。',
+      funFact: '鞭毛和菌毛在 3D 查看器中被适度夸张，以便更容易识别。',
     },
   },
   animal: {
     nucleus: {
-      note: 'Animal cells are shown with a softer membrane, central nucleus, mitochondria, and transport structures without a rigid wall.',
+      note: '动物细胞展示为柔软细胞膜、中央细胞核、线粒体和运输结构组合，没有坚硬细胞壁。',
     },
   },
   muscle: {
     mitochondria: {
-      note: 'Muscle fibers contain many mitochondria because contraction needs sustained ATP production.',
-      funFact: 'The stripe pattern is a simplified sarcomere cue, not a literal molecular model.',
+      note: '肌肉纤维含有许多线粒体，因为收缩需要持续 ATP 供应。',
+      funFact: '条纹图案是简化的肌节提示，并非严格分子模型。',
     },
   },
 }
@@ -353,12 +372,12 @@ function getCellProfile(cellId, customCells = getStoredCustomCells()) {
     return {
       ...baseProfile,
       summary: hasGeneratedModel
-        ? `AI-generated GLB from the uploaded image, using ${getCell(customCell.template).name} biology as context.`
-        : `Uploaded image queued for image-to-3D generation; fallback scaffold is ${getCell(customCell.template).name}.`,
+        ? `基于上传图片生成的 AI GLB 模型，参考${getCell(customCell.template).name}的生物学结构。`
+        : `上传图片已进入图像转 3D 队列；生成前使用${getCell(customCell.template).name}作为备用结构。`,
       comparison: hasGeneratedModel
-        ? 'This custom sample is loaded as a real generated GLB in the WebGL viewer.'
-        : `This custom sample will use the ${getCell(customCell.template).name} fallback while generation is running.`,
-      occurs: 'Uploaded by user as a custom microscope reference.',
+        ? '该自定义样本已作为真实生成的 GLB 加载到 WebGL 查看器中。'
+        : `生成进行中时，该自定义样本会使用${getCell(customCell.template).name}备用结构。`,
+      occurs: '用户上传的自定义显微参考。',
       organelles: baseProfile.organelles,
     }
   }
@@ -434,7 +453,7 @@ function delay(ms) {
 async function readApiResponse(response) {
   const payload = await response.json().catch(() => ({}))
   if (!response.ok || payload.error) {
-    throw new Error(payload.error || `Request failed with ${response.status}`)
+    throw new Error(payload.error || `请求失败，状态码 ${response.status}`)
   }
   return payload
 }
@@ -444,8 +463,30 @@ function getProviderPlan(provider) {
 }
 
 function getProviderLabel(provider) {
-  if (provider === 'local') return 'Local'
+  if (provider === 'local') return '本地'
   return GENERATION_PROVIDER_OPTIONS.find((item) => item.id === provider)?.label ?? 'Tripo'
+}
+
+function getViewModeLabel(mode) {
+  const labels = {
+    solid: '实体',
+    layers: '分层',
+    focus: '聚焦',
+  }
+  return labels[mode] ?? mode
+}
+
+function getGenerationStatusLabel(status) {
+  const labels = {
+    uploading: '上传中',
+    processing: '处理中',
+    queued: '排队中',
+    success: '成功',
+    failed: '失败',
+    pending: '等待中',
+    local: '本地',
+  }
+  return labels[status] ?? status
 }
 
 async function create3dGeneration({ provider, imageDataUrl, fileName, prompt }) {
@@ -482,22 +523,23 @@ async function waitFor3dModel(taskId, provider, onStatus) {
     onStatus?.(status)
 
     if (['success', 'completed', 'complete', 'done'].includes(String(status.status).toLowerCase())) {
-      if (!status.modelUrl) throw new Error(`${getProviderLabel(provider)} finished but no GLB model URL was returned.`)
+      if (!status.modelUrl) throw new Error(`${getProviderLabel(provider)}已完成，但没有返回 GLB 模型地址。`)
       return status
     }
 
     if (['failed', 'error', 'cancelled', 'canceled'].includes(String(status.status).toLowerCase())) {
-      throw new Error(status.error || `${getProviderLabel(provider)} generation failed.`)
+      throw new Error(status.error || `${getProviderLabel(provider)}生成失败。`)
     }
   }
 
-  throw new Error(`${getProviderLabel(provider)} generation timed out.`)
+  throw new Error(`${getProviderLabel(provider)}生成超时。`)
 }
 
 function getGenerationPrompt(cell) {
   const base = getCell(cell.template)
+  const promptName = CELL_PROMPT_NAMES[cell.template] ?? base.name
   return [
-    `A high quality educational 3D biological model of a ${base.name}.`,
+    `A high quality educational 3D biological model of a ${promptName}.`,
     'Make it a single integrated specimen, not a flat relief, not a display base.',
     'Preserve the recognizable major biological structures and use clean PBR materials.',
     'Style: polished interactive science app, clear organelles, soft studio lighting.',
@@ -530,13 +572,13 @@ function isLocalModelFile(file) {
 function createCustomCell(fileName, imageUrl, options = {}) {
   const template = inferCellTemplate(fileName)
   const base = getCell(template)
-  const name = cleanFileName(fileName) || 'Uploaded Cell'
+  const name = cleanFileName(fileName) || '上传细胞'
   const provider = options.provider || 'tripo'
 
   return {
     id: `custom-${Date.now()}`,
     name: name.length > 20 ? `${name.slice(0, 20)}...` : name,
-    type: options.type || `Uploaded ${base.name}`,
+    type: options.type || `上传的${base.name}`,
     accent: base.accent,
     custom: true,
     template,
@@ -548,7 +590,7 @@ function createCustomCell(fileName, imageUrl, options = {}) {
       taskId: options.taskId || '',
       modelUrl: options.modelUrl || '',
       rawModelUrl: options.rawModelUrl || '',
-      message: options.message || 'Waiting for image-to-3D generation.',
+      message: options.message || '等待图像转 3D 生成。',
     },
   }
 }
@@ -1443,22 +1485,22 @@ function CellFallback({ selectedCell, modelCellId, referenceImageUrl, selectedOr
 
   if (referenceImageUrl) {
     return (
-      <div className="cell-fallback upload-render-fallback" aria-label="Uploaded cell image fallback">
-        <img src={referenceImageUrl} alt="Uploaded cell reference" />
+      <div className="cell-fallback upload-render-fallback" aria-label="上传细胞图片备用视图">
+        <img src={referenceImageUrl} alt="上传的细胞参考图" />
       </div>
     )
   }
 
   if (visualCellId === 'plant') {
     return (
-      <div className="cell-fallback plant-render-fallback" aria-label="Plant cell image fallback">
-        <img src={plantCellRender} alt="Detailed plant cell fallback render" />
+      <div className="cell-fallback plant-render-fallback" aria-label="植物细胞图片备用视图">
+        <img src={plantCellRender} alt="植物细胞详细备用渲染图" />
       </div>
     )
   }
 
   return (
-    <div className="cell-fallback" aria-label="Cell illustration fallback">
+    <div className="cell-fallback" aria-label="细胞示意备用视图">
       <button
         type="button"
         className={selectedOrganelle === 'membrane' ? `fallback-cell-body ${visualCellId} active` : `fallback-cell-body ${visualCellId}`}
@@ -1528,7 +1570,7 @@ function LeftSidebar({ selectedCell, setSelectedCell, selectedOrganelle, setSele
         <header className="panel-title">
           <span>
             <SparklesIcon size={14} />
-            Cell Types
+            细胞类型
           </span>
           <ChevronDown size={14} />
         </header>
@@ -1555,7 +1597,7 @@ function LeftSidebar({ selectedCell, setSelectedCell, selectedOrganelle, setSele
         <header className="panel-title">
           <span>
             <CircleDot size={14} />
-            Organelles
+            细胞器
           </span>
           <ChevronDown size={14} />
         </header>
@@ -1580,14 +1622,14 @@ function LeftSidebar({ selectedCell, setSelectedCell, selectedOrganelle, setSele
 
 function ViewerControls({ crossSection, setCrossSection, viewMode, setViewMode }) {
   const modes = [
-    { id: 'solid', icon: Box, label: 'Solid' },
-    { id: 'layers', icon: Layers3, label: 'Layers' },
-    { id: 'focus', icon: CircleDot, label: 'Focus' },
+    { id: 'solid', icon: Box, label: '实体' },
+    { id: 'layers', icon: Layers3, label: '分层' },
+    { id: 'focus', icon: CircleDot, label: '聚焦' },
   ]
 
   return (
     <div className="viewer-controls">
-      <span>View Mode</span>
+      <span>视图模式</span>
       <div className="mode-buttons">
         {modes.map((mode) => {
           const Icon = mode.icon
@@ -1605,7 +1647,7 @@ function ViewerControls({ crossSection, setCrossSection, viewMode, setViewMode }
         })}
       </div>
       <label className="toggle-row">
-        <span>Cross-Section</span>
+        <span>剖面视图</span>
         <input type="checkbox" checked={crossSection} onChange={(event) => setCrossSection(event.target.checked)} />
         <i />
       </label>
@@ -1627,7 +1669,7 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
   const generatedModelUrl = getGeneratedModelUrl(cell)
   const generation = cell.custom ? cell.generation : null
   const generationProviderLabel = getProviderLabel(generation?.provider)
-  const generationFailureTitle = generation?.requestedProvider === 'auto' ? '3D generation failed' : `${generationProviderLabel} generation failed`
+  const generationFailureTitle = generation?.requestedProvider === 'auto' ? '3D 生成失败' : `${generationProviderLabel}生成失败`
   const detail = getOrganelleDetail(selectedCell, selectedOrganelle)
   const webglAvailable = canUseWebGL()
   const generationPending = cell.custom && !generatedModelUrl && generation?.status && !['failed', 'local'].includes(generation.status)
@@ -1636,20 +1678,20 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
   function handleRotate() {
     const next = !autoRotate
     setAutoRotate(next)
-    onNotify(next ? 'Auto rotate enabled' : 'Auto rotate paused')
+    onNotify(next ? '自动旋转已开启' : '自动旋转已暂停')
   }
 
   function handleIsolate() {
     const next = !isIsolated
     setIsIsolated(next)
     if (next) setViewMode('focus')
-    onNotify(next ? `${detail.title} focus mode` : 'Focus mode off')
+    onNotify(next ? `${detail.title}聚焦模式` : '聚焦模式已关闭')
   }
 
   function handleHideOthers() {
     const next = !hideOthers
     setHideOthers(next)
-    onNotify(next ? `Showing ${detail.title} with cell shell` : 'All structures visible')
+    onNotify(next ? `仅突出${detail.title}和细胞外壳` : '已显示全部结构')
   }
 
   function handleResetView() {
@@ -1659,7 +1701,7 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
     setProofMode(false)
     setViewMode('layers')
     setResetNonce((value) => value + 1)
-    onNotify('View reset')
+    onNotify('视图已重置')
   }
 
   function handleProofMode() {
@@ -1670,14 +1712,14 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
       setHideOthers(false)
       setAutoRotate(true)
     }
-    onNotify(next ? '3D proof mode: axes, grid, exploded meshes' : '3D proof mode off')
+    onNotify(next ? '3D 验证模式：坐标轴、网格、分解结构' : '3D 验证模式已关闭')
   }
 
   function handleScreenshot() {
     const ok = downloadCanvasImage(`${selectedCell}-${selectedOrganelle}.png`)
     setCapturePulse(true)
     window.setTimeout(() => setCapturePulse(false), 280)
-    onNotify(ok ? 'Screenshot downloaded' : 'Screenshot unavailable in this browser')
+    onNotify(ok ? '截图已下载' : '当前浏览器无法截图')
   }
 
   return (
@@ -1711,14 +1753,14 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
       </div>
       {referenceImageUrl && (
         <div className="custom-reference-layer">
-          <img src={referenceImageUrl} alt={`${cell.name} uploaded reference`} />
-          <span>{generatedModelUrl ? `Source image used for ${generationProviderLabel} 3D generation` : `Source image for ${generationProviderLabel} generation`}</span>
+          <img src={referenceImageUrl} alt={`${cell.name}上传参考图`} />
+          <span>{generatedModelUrl ? `用于${generationProviderLabel} 3D 生成的源图片` : `${generationProviderLabel}生成使用的源图片`}</span>
         </div>
       )}
       {generationPending && (
         <div className="generation-overlay">
-          <strong>{generation.status === 'uploading' ? `Uploading to ${generationProviderLabel}` : `Generating with ${generationProviderLabel}`}</strong>
-          <span>{generation.message || 'Waiting for AI-generated GLB...'}</span>
+          <strong>{generation.status === 'uploading' ? `正在上传到${generationProviderLabel}` : `正在使用${generationProviderLabel}生成`}</strong>
+          <span>{generation.message || '等待 AI 生成 GLB...'}</span>
           <div className="generation-meter">
             <i />
           </div>
@@ -1727,18 +1769,18 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
       {generationFailed && (
         <div className="generation-overlay failed">
           <strong>{generationFailureTitle}</strong>
-          <span>{generation.message || 'The saved upload failed before a GLB was returned.'}</span>
-          <button type="button" onClick={() => onRetryGeneration?.(cell.id)}>Retry Generation</button>
+          <span>{generation.message || '已保存的上传任务在返回 GLB 前失败。'}</span>
+          <button type="button" onClick={() => onRetryGeneration?.(cell.id)}>重试生成</button>
         </div>
       )}
       <button type="button" className={proofMode ? 'proof-launcher active' : 'proof-launcher'} onClick={handleProofMode} aria-pressed={proofMode}>
         <Box size={15} />
-        3D Proof
+        3D 验证
       </button>
       {proofMode && (
         <div className="proof-badge">
-          <strong>LIVE WEBGL 3D</strong>
-          <span>{generatedModelUrl ? `${generationProviderLabel} GLB · OrbitControls · GLB export` : referenceImageUrl ? `${generationProviderLabel} task pending · fallback 3D scaffold` : 'Exploded meshes · XYZ axes · GLB export'}</span>
+          <strong>实时 WebGL 3D</strong>
+          <span>{generatedModelUrl ? `${generationProviderLabel} GLB · 轨道控制 · GLB 导出` : referenceImageUrl ? `${generationProviderLabel}任务等待中 · 备用 3D 结构` : '分解结构 · XYZ 坐标轴 · GLB 导出'}</span>
         </div>
       )}
       {labelVisible && (
@@ -1748,38 +1790,38 @@ function CenterStage({ selectedCell, selectedOrganelle, setSelectedOrganelle, cr
         </button>
       )}
       <div className="stage-status">
-        {generatedModelUrl ? `${generationProviderLabel} GLB loaded` : generationFailed ? `${generationProviderLabel} failed; source image shown` : referenceImageUrl ? `${generationProviderLabel} ${generation?.status || 'pending'}` : webglAvailable ? 'WebGL live 3D' : 'Fallback image'} · {autoRotate || proofMode ? 'Auto rotate' : 'Manual orbit'} · {viewMode}
+        {generatedModelUrl ? `${generationProviderLabel} GLB 已加载` : generationFailed ? `${generationProviderLabel}失败；显示源图片` : referenceImageUrl ? `${generationProviderLabel} ${getGenerationStatusLabel(generation?.status || 'pending')}` : webglAvailable ? 'WebGL 实时 3D' : '备用图片'} · {autoRotate || proofMode ? '自动旋转' : '拖动旋转 / 滚轮缩放'} · {getViewModeLabel(viewMode)}
       </div>
       {capturePulse && <div className="capture-pulse" />}
       <div className="stage-toolbar">
         <button type="button" className={autoRotate ? 'active' : ''} onClick={handleRotate} aria-pressed={autoRotate}>
           <Move3D size={14} />
-          Rotate
+          旋转
         </button>
         <button type="button" className={isIsolated ? 'active' : ''} onClick={handleIsolate} aria-pressed={isIsolated}>
           <Eye size={14} />
-          Isolate
+          聚焦
         </button>
         <button type="button" className={hideOthers ? 'active' : ''} onClick={handleHideOthers} aria-pressed={hideOthers}>
           <Layers3 size={14} />
-          Hide Others
+          隐藏其他
         </button>
         <button type="button" onClick={handleResetView}>
           <RotateCcw size={14} />
-          Reset View
+          重置视图
         </button>
         <button type="button" className={proofMode ? 'active proof-active' : ''} onClick={handleProofMode} aria-pressed={proofMode}>
           <Box size={14} />
-          3D Proof
+          3D 验证
         </button>
         <span />
         <button type="button" onClick={handleScreenshot}>
           <Camera size={14} />
-          Screenshot
+          截图
         </button>
         <button type="button" onClick={onExport}>
           <Upload size={14} />
-          3D Export
+          导出 GLB
         </button>
       </div>
     </section>
@@ -1794,20 +1836,20 @@ function DetailPanel({ selectedCell, selectedOrganelle, favoriteKey, setFavorite
   function toggleFavorite() {
     const next = isFavorite ? '' : currentKey
     setFavoriteKey(next)
-    onNotify(isFavorite ? `${detail.title} removed from favorites` : `${detail.title} saved to favorites`)
+    onNotify(isFavorite ? `已从收藏移除${detail.title}` : `已收藏${detail.title}`)
   }
 
   function toggleLabel() {
     const next = !labelVisible
     setLabelVisible(next)
-    onNotify(next ? 'Stage label visible' : 'Stage label hidden')
+    onNotify(next ? '舞台标签已显示' : '舞台标签已隐藏')
   }
 
   return (
     <aside className="right-rail">
       <section className="panel detail-panel">
         <header className="detail-title">
-          <span>Organelle Details</span>
+          <span>细胞器详情</span>
           <button type="button" className={isFavorite ? 'detail-fav active' : 'detail-fav'} onClick={toggleFavorite} aria-pressed={isFavorite}>
             <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} />
           </button>
@@ -1826,21 +1868,21 @@ function DetailPanel({ selectedCell, selectedOrganelle, favoriteKey, setFavorite
         </div>
         <dl className="detail-grid">
           <div>
-            <dt>Size</dt>
+            <dt>尺寸</dt>
             <dd>{detail.size}</dd>
           </div>
           <div>
-            <dt>Location</dt>
+            <dt>位置</dt>
             <dd>{detail.location}</dd>
           </div>
           <div>
-            <dt>Visible in LM</dt>
+            <dt>光镜可见</dt>
             <dd>{detail.visible}</dd>
           </div>
           <div>
-            <dt>Label</dt>
+            <dt>标签</dt>
             <dd>
-              <button type="button" className={labelVisible ? 'mini-toggle active' : 'mini-toggle'} onClick={toggleLabel} aria-pressed={labelVisible} aria-label="Toggle label" />
+              <button type="button" className={labelVisible ? 'mini-toggle active' : 'mini-toggle'} onClick={toggleLabel} aria-pressed={labelVisible} aria-label="切换标签" />
               <span className="color-dot" style={{ background: detail.accent }} />
             </dd>
           </div>
@@ -1849,15 +1891,15 @@ function DetailPanel({ selectedCell, selectedOrganelle, favoriteKey, setFavorite
 
       <section className="panel notes-panel">
         <header className="panel-title">
-          <span>Biological Notes</span>
+          <span>生物学笔记</span>
         </header>
         <p>{detail.note}</p>
-        <blockquote>{detail.funFact ?? 'Some white blood cells can change shape to squeeze between blood vessel walls and reach infected tissue.'}</blockquote>
+        <blockquote>{detail.funFact ?? '部分白细胞可以改变形状，挤过血管壁并到达感染组织。'}</blockquote>
       </section>
 
       <section className="panel occurs-panel">
         <header className="panel-title">
-          <span>Where It Occurs</span>
+          <span>常见位置</span>
         </header>
         <div className="body-map">
           <div className="body-line" />
@@ -1885,7 +1927,7 @@ function BottomDeck({ selectedCell, selectedMicroscope, setSelectedMicroscope, u
     <section className="bottom-deck">
       <div className="panel media-panel">
         <header className="panel-title">
-          <span>Microscope View</span>
+          <span>显微视图</span>
           <small>3</small>
         </header>
         <div className="micro-grid">
@@ -1907,7 +1949,7 @@ function BottomDeck({ selectedCell, selectedMicroscope, setSelectedMicroscope, u
             onClick={() => fileInputRef.current?.click()}
           >
             {uploadedImage?.url ? <Image size={16} /> : <Box size={16} />}
-            {uploadedImage?.name || 'Add Image / GLB'}
+            {uploadedImage?.name || '添加图片 / GLB'}
           </button>
           <input
             ref={fileInputRef}
@@ -1926,7 +1968,7 @@ function BottomDeck({ selectedCell, selectedMicroscope, setSelectedMicroscope, u
 
       <div className="panel compare-panel">
         <header className="panel-title">
-          <span>Compare Cells</span>
+          <span>细胞对比</span>
           <small>2</small>
         </header>
         <button type="button" className="compare-box" onClick={() => onCompare(compareTarget.id)}>
@@ -1935,7 +1977,7 @@ function BottomDeck({ selectedCell, selectedMicroscope, setSelectedMicroscope, u
             <strong>{selected.name.replace(' Cell', '')}</strong>
             <small>{selected.type}</small>
           </div>
-          <span className="versus">VS</span>
+          <span className="versus">对比</span>
           <CellThumb cell={compareTarget} />
           <div>
             <strong>{compareTarget.name}</strong>
@@ -1951,7 +1993,7 @@ function StudioHeader({ activePanel, setActivePanel, onNotify }) {
   function openPanel(panel) {
     const next = activePanel === panel ? null : panel
     setActivePanel(next)
-    onNotify(next ? `${panel} opened` : `${panel} closed`)
+    onNotify(next ? `${PANEL_LABELS[panel]}已打开` : `${PANEL_LABELS[panel]}已关闭`)
   }
 
   return (
@@ -1961,30 +2003,31 @@ function StudioHeader({ activePanel, setActivePanel, onNotify }) {
           <CellThumb cell={CELL_TYPES[1]} selected />
         </div>
         <div>
-          <strong>Cell Architecture Studio</strong>
-          <span>Explore life at the microscopic level</span>
+          <strong>AI 3D 模型工坊</strong>
+          <span>一个用于查看、上传、截图和导出 3D 模型的中文体验版工具。</span>
         </div>
       </div>
       <nav className="studio-nav">
         <button type="button" className={activePanel === 'Gallery' ? 'active' : ''} onClick={() => openPanel('Gallery')}>
           <Grid3X3 size={15} />
-          Gallery
+          图库
         </button>
         <button type="button" className={activePanel === 'Library' ? 'active' : ''} onClick={() => openPanel('Library')}>
           <Library size={15} />
-          Library
+          结构库
         </button>
         <button type="button" className={activePanel === 'Notebooks' ? 'active' : ''} onClick={() => openPanel('Notebooks')}>
           <BookOpen size={15} />
-          Notebooks
+          观察笔记
         </button>
         <button type="button" className={activePanel === 'Settings' ? 'active' : ''} onClick={() => openPanel('Settings')}>
           <Settings size={15} />
-          Settings
+          设置
         </button>
       </nav>
       <button type="button" className={activePanel === 'Profile' ? 'profile-button active' : 'profile-button'} onClick={() => openPanel('Profile')}>
         <Dna size={18} />
+        <span>当前项目</span>
         <ChevronDown size={13} />
       </button>
     </header>
@@ -2026,7 +2069,7 @@ function WorkspaceDrawer({
   const profile = getCellProfile(selectedCell)
   const noteKey = `${selectedCell}:${selectedOrganelle}`
   const noteValue = notes[noteKey] ?? ''
-  const savedFavorite = favoriteKey ? favoriteKey.replace(':', ' / ') : 'None'
+  const savedFavorite = favoriteKey ? favoriteKey.replace(':', ' / ') : '无'
 
   function renderContent() {
     if (activePanel === 'Gallery') {
@@ -2040,21 +2083,21 @@ function WorkspaceDrawer({
             </div>
           </div>
           <div className="drawer-actions">
-            <button type="button" className="drawer-primary" onClick={onSaveGallery}>Save View</button>
-            <button type="button" className="drawer-secondary" onClick={onExport}>Export GLB</button>
+            <button type="button" className="drawer-primary" onClick={onSaveGallery}>保存视图</button>
+            <button type="button" className="drawer-secondary" onClick={onExport}>导出 GLB</button>
           </div>
           {uploadedImage && (
             <div className="uploaded-tile" style={{ '--upload-preview': `url(${uploadedImage.url})` }}>
               <span />
               <div>
                 <strong>{uploadedImage.name}</strong>
-                <small>Attached microscope reference</small>
+                <small>已附加显微参考图</small>
               </div>
             </div>
           )}
           <div className="drawer-list">
             {galleryItems.length === 0 ? (
-              <p className="empty-state">No saved views yet.</p>
+              <p className="empty-state">还没有保存的视图。</p>
             ) : (
               galleryItems.map((item) => {
                 const itemCell = getCell(item.cellId)
@@ -2066,7 +2109,7 @@ function WorkspaceDrawer({
                     onClick={() => {
                       onSelectCell(item.cellId)
                       onSelectOrganelle(item.organelleId)
-                      onNotify('Saved view restored')
+                      onNotify('已恢复保存的视图')
                     }}
                   >
                     <CellThumb cell={itemCell} selected={item.cellId === selectedCell} />
@@ -2079,7 +2122,7 @@ function WorkspaceDrawer({
               })
             )}
           </div>
-          {galleryItems.length > 0 && <button type="button" className="drawer-secondary full" onClick={onClearGallery}>Clear Gallery</button>}
+          {galleryItems.length > 0 && <button type="button" className="drawer-secondary full" onClick={onClearGallery}>清空图库</button>}
         </div>
       )
     }
@@ -2098,7 +2141,7 @@ function WorkspaceDrawer({
                   className={selectedOrganelle === id ? 'library-card active' : 'library-card'}
                   onClick={() => {
                     onSelectOrganelle(id)
-                    onNotify(`${item.title} selected`)
+                    onNotify(`已选择${item.title}`)
                   }}
                 >
                   <span style={{ background: item.accent }} />
@@ -2120,13 +2163,13 @@ function WorkspaceDrawer({
             <textarea
               value={noteValue}
               onChange={(event) => onUpdateNote(noteKey, event.target.value)}
-              placeholder="Record observations, questions, or narration notes..."
+              placeholder="记录观察、问题或讲解备注..."
             />
           </label>
           <div className="drawer-meta inline">
-            <span>{noteValue.length} chars</span>
-            <span>Autosaved locally</span>
-            <span>{Object.keys(notes).length} notes</span>
+            <span>{noteValue.length} 字</span>
+            <span>已自动保存到本地</span>
+            <span>{Object.keys(notes).length} 条笔记</span>
           </div>
         </div>
       )
@@ -2137,22 +2180,22 @@ function WorkspaceDrawer({
         <div className="drawer-content settings-list">
           <label className="settings-row">
             <span>
-              <strong>Organelle Labels</strong>
-              <small>Show the floating label on the stage.</small>
+              <strong>细胞器标签</strong>
+              <small>在舞台上显示悬浮标签。</small>
             </span>
             <input type="checkbox" checked={labelVisible} onChange={(event) => onSetLabelVisible(event.target.checked)} />
           </label>
           <label className="settings-row">
             <span>
-              <strong>Cross-Section</strong>
-              <small>Keep the cutaway view enabled.</small>
+              <strong>剖面视图</strong>
+              <small>保持切面观察视图开启。</small>
             </span>
             <input type="checkbox" checked={crossSection} onChange={(event) => onSetCrossSection(event.target.checked)} />
           </label>
           <div className="settings-row">
             <span>
-              <strong>Render Quality</strong>
-              <small>Balanced is faster; high uses denser DPR.</small>
+              <strong>渲染质量</strong>
+              <small>均衡模式更快，高质量模式使用更高 DPR。</small>
             </span>
             <div className="segmented">
               {['balanced', 'high'].map((quality) => (
@@ -2162,14 +2205,14 @@ function WorkspaceDrawer({
                   className={settings.quality === quality ? 'active' : ''}
                   onClick={() => onUpdateSettings({ ...settings, quality })}
                 >
-                  {quality}
+                  {quality === 'balanced' ? '均衡' : '高质量'}
                 </button>
               ))}
             </div>
           </div>
           <div className="settings-row">
             <span>
-              <strong>Generation Provider</strong>
+              <strong>生成服务</strong>
               <small>{GENERATION_PROVIDER_OPTIONS.find((item) => item.id === settings.generationProvider)?.description}</small>
             </span>
             <div className="segmented provider-segmented">
@@ -2187,8 +2230,8 @@ function WorkspaceDrawer({
           </div>
           <label className="settings-row">
             <span>
-              <strong>Compact UI</strong>
-              <small>Slightly tighter panels for smaller screens.</small>
+              <strong>紧凑界面</strong>
+              <small>为小屏幕使用更紧凑的面板。</small>
             </span>
             <input type="checkbox" checked={settings.compactUi} onChange={(event) => onUpdateSettings({ ...settings, compactUi: event.target.checked })} />
           </label>
@@ -2220,8 +2263,8 @@ function WorkspaceDrawer({
             ))}
           </div>
           <div className="drawer-actions">
-            <button type="button" className="drawer-primary" onClick={() => onSelectCell(compareCell)}>Open Compared Cell</button>
-            <button type="button" className="drawer-secondary" onClick={() => onSetCompareCell(profile.compareTarget)}>Reset Target</button>
+            <button type="button" className="drawer-primary" onClick={() => onSelectCell(compareCell)}>打开对比细胞</button>
+            <button type="button" className="drawer-secondary" onClick={() => onSetCompareCell(profile.compareTarget)}>重置目标</button>
           </div>
         </div>
       )
@@ -2230,12 +2273,13 @@ function WorkspaceDrawer({
     return (
       <div className="drawer-content">
         <div className="profile-stats">
-          <span><strong>{allCells.length}</strong><small>cells</small></span>
-          <span><strong>{galleryItems.length}</strong><small>saved</small></span>
-          <span><strong>{Object.keys(notes).length}</strong><small>notes</small></span>
+          <span><strong>{allCells.length}</strong><small>细胞</small></span>
+          <span><strong>{galleryItems.length}</strong><small>已保存</small></span>
+          <span><strong>{Object.keys(notes).length}</strong><small>笔记</small></span>
         </div>
-        <p className="drawer-copy">Favorite: {savedFavorite}</p>
-        <p className="drawer-copy">Occurs: {profile.occurs}</p>
+        <p className="drawer-copy">收藏：{savedFavorite}</p>
+        <p className="drawer-copy">常见位置：{profile.occurs}</p>
+        <p className="drawer-copy">本项目基于 3DCellForge 开源项目进行中文化体验改造。</p>
       </div>
     )
   }
@@ -2244,17 +2288,17 @@ function WorkspaceDrawer({
     <motion.section className="workspace-drawer" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}>
       <header>
         <div>
-          <strong>{activePanel}</strong>
+          <strong>{PANEL_LABELS[activePanel]}</strong>
           <span>{WORKSPACE_PANELS[activePanel]}</span>
         </div>
-        <button type="button" onClick={onClose} aria-label="Close panel">
+        <button type="button" onClick={onClose} aria-label="关闭面板">
           <X size={15} />
         </button>
       </header>
       <div className="drawer-meta">
         <span>{cell.name}</span>
         <span>{detail.title}</span>
-        <span>Cross-section ready</span>
+        <span>剖面视图就绪</span>
       </div>
       {renderContent()}
     </motion.section>
@@ -2275,7 +2319,7 @@ function App() {
   const [selectedOrganelle, setSelectedOrganelle] = useState('nucleus')
   const [crossSection, setCrossSection] = useState(true)
   const [activePanel, setActivePanel] = useState(null)
-  const [toast, setToast] = useState('Plant cell ready')
+  const [toast, setToast] = useState('植物细胞已就绪')
   const [favoriteKey, setFavoriteKey] = useState('')
   const [labelVisible, setLabelVisible] = useState(() => loadStoredValue('bio-demo-label-visible', true))
   const [selectedMicroscope, setSelectedMicroscope] = useState(MICROSCOPE_IMAGES[0].label)
@@ -2312,7 +2356,7 @@ function App() {
     setSelectedCell(cellId)
     setSelectedOrganelle(getDefaultOrganelle(cellId))
     setCompareCell((current) => (current === cellId ? getCellProfile(cellId).compareTarget : current))
-    setToast(`${getCell(cellId).name} loaded`)
+    setToast(`${getCell(cellId).name}已加载`)
   }
 
   async function handleExport() {
@@ -2327,17 +2371,17 @@ function App() {
         crossSection,
         selectedMicroscope,
         exportedAt: new Date().toISOString(),
-        fallbackReason: 'WebGL model exporter is not available in this browser.',
+        fallbackReason: '当前浏览器无法使用 WebGL 模型导出器。',
       })
-      setToast('WebGL unavailable; metadata exported')
+      setToast('WebGL 不可用；已导出元数据')
       return
     }
 
-    setToast('Preparing GLB export')
+    setToast('正在准备 GLB 导出')
     try {
       const glb = await sceneExporter()
       downloadBlob(`${selectedCell}-${selectedOrganelle}.glb`, glb)
-      setToast(`${cell.name} GLB downloaded`)
+      setToast(`${cell.name} GLB 已下载`)
     } catch (error) {
       console.error(error)
       downloadJson(`${selectedCell}-cell-export.json`, {
@@ -2347,9 +2391,9 @@ function App() {
         crossSection,
         selectedMicroscope,
         exportedAt: new Date().toISOString(),
-        fallbackReason: error instanceof Error ? error.message : 'GLB export failed.',
+        fallbackReason: error instanceof Error ? error.message : 'GLB 导出失败。',
       })
-      setToast('GLB failed; metadata exported')
+      setToast('GLB 导出失败；已导出元数据')
     }
   }
 
@@ -2384,10 +2428,10 @@ function App() {
             status: 'uploading',
             modelUrl: '',
             rawModelUrl: '',
-            message: `Sending image to ${label}.`,
+            message: `正在发送图片到${label}。`,
           },
         }))
-        setToast(`Creating ${label} image-to-3D task`)
+        setToast(`正在创建${label}图像转 3D 任务`)
 
         const task = await create3dGeneration({
           provider,
@@ -2403,10 +2447,10 @@ function App() {
             requestedProvider,
             status: 'processing',
             taskId: task.taskId,
-            message: `${label} is generating the GLB model.`,
+            message: `${label}正在生成 GLB 模型。`,
           },
         }))
-        setToast(`${label} task started: ${String(task.taskId).slice(0, 8)}`)
+        setToast(`${label}任务已启动：${String(task.taskId).slice(0, 8)}`)
 
         const finalStatus = await waitFor3dModel(task.taskId, provider, (status) => {
           updateCustomCell(customCell.id, (cell) => ({
@@ -2416,7 +2460,7 @@ function App() {
               requestedProvider,
               status: status.status || 'processing',
               taskId: task.taskId,
-              message: status.progress ? `${label} progress ${status.progress}%` : `${label} status: ${status.status || 'processing'}`,
+              message: status.progress ? `${label}进度 ${status.progress}%` : `${label}状态：${getGenerationStatusLabel(status.status || 'processing')}`,
             },
           }))
         })
@@ -2430,13 +2474,13 @@ function App() {
             taskId: task.taskId,
             modelUrl: finalStatus.modelUrl,
             rawModelUrl: finalStatus.rawModelUrl,
-            message: `${label} GLB loaded.`,
+            message: `${label} GLB 已加载。`,
           },
         }))
-        setToast(`${customCell.name} ${label} 3D model ready`)
+        setToast(`${customCell.name} ${label} 3D 模型已就绪`)
         return
       } catch (error) {
-        const message = error instanceof Error ? error.message : `${label} generation failed.`
+        const message = error instanceof Error ? error.message : `${label}生成失败。`
         errors.push(`${label}: ${message}`)
 
         if (provider !== providers[providers.length - 1]) {
@@ -2446,10 +2490,10 @@ function App() {
               provider,
               requestedProvider,
               status: 'processing',
-              message: `${label} failed; trying ${getProviderLabel(providers[providers.indexOf(provider) + 1])}.`,
+              message: `${label}失败；正在尝试${getProviderLabel(providers[providers.indexOf(provider) + 1])}。`,
             },
           }))
-          setToast(`${label} failed; trying backup provider`)
+          setToast(`${label}失败；正在尝试备用服务`)
         }
       }
     }
@@ -2460,13 +2504,13 @@ function App() {
   async function handleRetryGeneration(cellId) {
     const cell = getCustomCell(cellId, customCells)
     if (!cell?.imageUrl) {
-      setToast('No source image to retry')
+      setToast('没有可重试的源图片')
       return
     }
 
     setSelectedCell(cell.id)
     setSelectedOrganelle(getDefaultOrganelle(cell.id))
-    setToast('Retrying 3D generation')
+    setToast('正在重试 3D 生成')
 
     try {
       await generateCustomCellModel(cell, cell.imageUrl, `${cell.name}.png`)
@@ -2479,10 +2523,10 @@ function App() {
           status: 'failed',
           modelUrl: '',
           rawModelUrl: '',
-          message: error instanceof Error ? error.message : '3D generation failed.',
+          message: error instanceof Error ? error.message : '3D 生成失败。',
         },
       }))
-      setToast(error instanceof Error ? error.message : 'Image-to-3D generation failed')
+      setToast(error instanceof Error ? error.message : '图像转 3D 生成失败')
     }
   }
 
@@ -2492,7 +2536,7 @@ function App() {
       return
     }
 
-    setToast('Uploading image for 3D generation')
+    setToast('正在上传图片用于 3D 生成')
     let customCell = null
     try {
       const imageUrl = await fileToDataUrl(file)
@@ -2502,7 +2546,7 @@ function App() {
         provider: settings.generationProvider,
         requestedProvider: settings.generationProvider,
         status: 'uploading',
-        message: 'Sending image to backend.',
+        message: '正在将图片发送到后端。',
       }
       const nextCustomCells = [customCell, ...customCells].slice(0, 8)
 
@@ -2522,25 +2566,25 @@ function App() {
             ...cell.generation,
             requestedProvider: settings.generationProvider,
             status: 'failed',
-            message: error instanceof Error ? error.message : '3D generation failed.',
+            message: error instanceof Error ? error.message : '3D 生成失败。',
           },
         }))
       }
-      setToast(error instanceof Error ? error.message : 'Image-to-3D generation failed')
+      setToast(error instanceof Error ? error.message : '图像转 3D 生成失败')
     }
   }
 
   async function handleUploadLocalModel(file) {
-    setToast('Importing local 3D model')
+    setToast('正在导入本地 3D 模型')
     let customCell = null
 
     try {
       customCell = createCustomCell(file.name, '', {
         provider: 'local',
         requestedProvider: 'local',
-        type: 'Local 3D Model',
+        type: '本地 3D 模型',
         status: 'uploading',
-        message: 'Saving model to local cache.',
+        message: '正在将模型保存到本地缓存。',
       })
       const nextCustomCells = [customCell, ...customCells].slice(0, 8)
 
@@ -2562,10 +2606,10 @@ function App() {
           taskId: localModel.taskId,
           modelUrl: localModel.modelUrl,
           rawModelUrl: '',
-          message: 'Local GLB loaded from disk cache.',
+          message: '本地 GLB 已从磁盘缓存加载。',
         },
       }))
-      setToast(`${customCell.name} local 3D model ready`)
+      setToast(`${customCell.name}本地 3D 模型已就绪`)
     } catch (error) {
       console.error(error)
       if (customCell) {
@@ -2575,11 +2619,11 @@ function App() {
             provider: 'local',
             requestedProvider: 'local',
             status: 'failed',
-            message: error instanceof Error ? error.message : 'Local model import failed.',
+            message: error instanceof Error ? error.message : '本地模型导入失败。',
           },
         }))
       }
-      setToast(error instanceof Error ? error.message : 'Local model import failed')
+      setToast(error instanceof Error ? error.message : '本地模型导入失败')
     }
   }
 
@@ -2592,12 +2636,12 @@ function App() {
       createdAt: new Date().toISOString(),
     }
     setGalleryItems((items) => [item, ...items].slice(0, 12))
-    setToast('View saved to Gallery')
+    setToast('视图已保存到图库')
   }
 
   function handleClearGallery() {
     setGalleryItems([])
-    setToast('Gallery cleared')
+    setToast('图库已清空')
   }
 
   function handleUpdateNote(noteKey, value) {
@@ -2612,7 +2656,7 @@ function App() {
   function handleOpenCompare(cellId) {
     setCompareCell(cellId)
     setActivePanel('Compare')
-    setToast(`${getCell(selectedCell).name} compared with ${getCell(cellId).name}`)
+    setToast(`${getCell(selectedCell).name}已与${getCell(cellId).name}对比`)
   }
 
   return (
@@ -2638,7 +2682,7 @@ function App() {
           onSelectOrganelle={setSelectedOrganelle}
           onSetCompareCell={(cellId) => {
             setCompareCell(cellId)
-            setToast(`${getCell(cellId).name} set as comparison target`)
+            setToast(`${getCell(cellId).name}已设为对比目标`)
           }}
           onSaveGallery={handleSaveGallery}
           onClearGallery={handleClearGallery}
