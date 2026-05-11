@@ -4,7 +4,7 @@
 
 AI-powered interactive 3D cell generation and exploration studio.
 
-3DCellForge is a React + Three.js prototype for exploring biological cell models in a polished browser UI. It supports live WebGL orbit controls, organelle panels, screenshots, GLB export, and optional image-to-3D providers for generating real 3D models from uploaded reference images.
+3DCellForge is a React + Three.js prototype for exploring biological cell models in a polished browser UI. It supports live WebGL orbit controls, organelle panels, screenshots, GLB export, and optional image-to-3D providers including Tripo, Hyper3D Rodin, and Hunyuan3D for generating real 3D models from uploaded reference images.
 
 ## Demo
 
@@ -17,7 +17,7 @@ Open the demo video: [3DCellForge-demo-2026-05-10.mp4](docs/demo/3DCellForge-dem
 - Interactive cell viewer built with React Three Fiber.
 - Drag to rotate, scroll to zoom, and toggle 3D proof mode.
 - Organelle detail cards, microscope references, comparison panel, notes, and gallery actions.
-- Tripo cloud image-to-3D pipeline through a local Node backend.
+- Tripo and Hyper3D Rodin cloud image-to-3D pipelines through a local Node backend.
 - Hunyuan3D local provider support as a backup generation path.
 - Cached demo GLB models for offline-friendly screenshots and demos.
 - Auxiliary Khronos glTF reference models for GLB loader and PBR material checks.
@@ -32,6 +32,7 @@ Open the demo video: [3DCellForge-demo-2026-05-10.mp4](docs/demo/3DCellForge-dem
 - Drei
 - Framer Motion
 - Tripo API optional backend
+- Hyper3D Rodin API optional backend
 - Hunyuan3D local API optional backend
 
 ## Quick Start
@@ -55,6 +56,7 @@ Then set:
 
 ```bash
 TRIPO_API_KEY=your_tripo_key
+RODIN_API_KEY=vibecoding
 ```
 
 For Hunyuan3D local backup mode, start your local Hunyuan3D API server and set:
@@ -68,22 +70,25 @@ HUNYUAN_STATUS_PATH=/status
 The 3D generation backend supports these provider paths:
 
 ```text
-Tripo   Cloud generation only (default)
-Auto    Tripo first, Hunyuan backup
+Tripo   Tripo cloud generation only (default)
+Rodin   Hyper3D Rodin cloud generation only
+Auto    Tripo, Rodin, then Hunyuan backup
 Hunyuan Local Hunyuan3D generation only
 ```
 
 The upload panel exposes the full generation mode choice before picking a file:
 
 ```text
-Tripo       Cloud GLB generation
+Tripo       Tripo cloud GLB generation
+Rodin       Hyper3D Rodin cloud GLB generation
 Hunyuan     Local Hunyuan3D GLB generation
-JS Depth    Browser-side image relief with layered PNG fallback
-Auto        Tripo, then Hunyuan, then JS Depth fallback
+Cinematic   Layered transparent PNG composition for high-quality demos
+Auto        Tripo, Rodin, Hunyuan, then Cinematic fallback
 Local GLB   Import an existing .glb or self-contained .gltf
 ```
 
 Tripo uploads use the current STS object-storage flow (`/upload/sts/token`) before creating an `image_to_model` task.
+Rodin uploads use Hyper3D's `multipart/form-data` task API, then poll status/download endpoints before caching the GLB.
 Generated GLBs are cached by the Node backend under `.generated-models/`, so later views use the local copy instead of the temporary Tripo URL.
 
 You can also import a local `.glb` or self-contained `.gltf` from the Microscope View add button. Imported models become custom Cell Types and are served from the same local cache.

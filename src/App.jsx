@@ -285,16 +285,18 @@ const MODEL_API_BASE = import.meta.env.VITE_MODEL_API_BASE || import.meta.env.VI
 const GENERATION_POLL_INTERVAL_MS = 3500
 const GENERATION_TIMEOUT_MS = 8 * 60 * 1000
 const GENERATION_PROVIDER_OPTIONS = [
-  { id: 'auto', label: 'Auto', description: 'Tripo first, Hunyuan backup.' },
+  { id: 'auto', label: 'Auto', description: 'Tripo, Rodin, then Hunyuan backup.' },
   { id: 'tripo', label: 'Tripo', description: 'Cloud generation.' },
+  { id: 'rodin', label: 'Rodin', description: 'Hyper3D Rodin cloud generation.' },
   { id: 'hunyuan', label: 'Hunyuan', description: 'Local Hunyuan3D server.' },
 ]
 const GENERATION_PROVIDER_IDS = new Set(GENERATION_PROVIDER_OPTIONS.map((provider) => provider.id))
 const GENERATION_MODE_OPTIONS = [
   { id: 'tripo', label: 'Tripo', description: 'Cloud GLB generation.' },
+  { id: 'rodin', label: 'Rodin', description: 'Hyper3D Rodin GLB generation.' },
   { id: 'hunyuan', label: 'Hunyuan', description: 'Local Hunyuan3D GLB generation.' },
-  { id: 'cinematic', label: 'JS Depth', description: 'Browser-side image relief with layered PNG fallback.' },
-  { id: 'auto', label: 'Auto', description: 'Tripo, then Hunyuan, then JS Depth fallback.' },
+  { id: 'cinematic', label: 'Cinematic', description: 'Layered transparent PNG composition.' },
+  { id: 'auto', label: 'Auto', description: 'Tripo, Rodin, Hunyuan, then Cinematic fallback.' },
   { id: 'local', label: 'Local GLB', description: 'Import an existing GLB or GLTF file.' },
 ]
 const GENERATION_MODE_IDS = new Set(GENERATION_MODE_OPTIONS.map((mode) => mode.id))
@@ -995,7 +997,7 @@ async function readApiResponse(response) {
 }
 
 function getProviderPlan(provider) {
-  return provider === 'auto' ? ['tripo', 'hunyuan', 'cinematic'] : [provider || 'tripo']
+  return provider === 'auto' ? ['tripo', 'rodin', 'hunyuan', 'cinematic'] : [provider || 'tripo']
 }
 
 function getProviderLabel(provider) {
