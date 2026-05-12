@@ -399,6 +399,22 @@
   accent-color: #72a4bf;
 }
 
+.settings-select {
+  min-width: 160px;
+  padding: 6px 10px;
+  border: 1px solid #b8c6cc;
+  border-radius: 6px;
+  background: #fff;
+  color: #2c3a3d;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.settings-select:focus {
+  outline: 2px solid #72a4bf;
+  outline-offset: 1px;
+}
+
 .segmented {
   display: inline-grid;
   grid-template-columns: repeat(2, auto);
@@ -1844,16 +1860,28 @@
 }
 
 .generation-mode-pills {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: 4px;
   min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.generation-mode-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .generation-mode-pills button {
+  flex: 0 0 auto;
   min-width: 0;
   min-height: 26px;
-  padding: 5px 6px;
+  padding: 5px 10px;
   overflow: hidden;
   border: 1px solid rgba(112, 101, 84, 0.16);
   border-radius: 8px;
@@ -1865,6 +1893,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+  scroll-snap-align: start;
 }
 
 .generation-mode-pills button.active {
@@ -2171,9 +2200,5 @@ input:focus-visible + i {
 
   .generation-mode-row {
     grid-template-columns: 1fr;
-  }
-
-  .generation-mode-pills {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

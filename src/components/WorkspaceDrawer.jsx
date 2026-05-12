@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
+import { FAL_MODEL_OPTIONS } from '../config/appConfig.js'
 import { CELL_TYPES, KHRONOS_REFERENCE_CELLS, WORKSPACE_PANELS } from '../domain/cellData.js'
 import { getAvailableOrganelleIds, getCell, getCellProfile, getOrganelleDetail } from '../domain/cellCatalog.js'
 import { CellThumb } from './CellThumb.jsx'
@@ -215,6 +216,21 @@ export function WorkspaceDrawer({
               <small>Slightly tighter panels for smaller screens.</small>
             </span>
             <input type="checkbox" checked={settings.compactUi} onChange={(event) => onUpdateSettings({ ...settings, compactUi: event.target.checked })} />
+          </label>
+          <label className="settings-row">
+            <span>
+              <strong>Fal Model</strong>
+              <small>Submodel used when Fal generation is selected.</small>
+            </span>
+            <select
+              className="settings-select"
+              value={settings.falModelId}
+              onChange={(event) => onUpdateSettings({ ...settings, falModelId: event.target.value })}
+            >
+              {FAL_MODEL_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id} title={option.description}>{option.label}</option>
+              ))}
+            </select>
           </label>
         </div>
       )

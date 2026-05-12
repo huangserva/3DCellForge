@@ -20,6 +20,10 @@ export const RODIN_MATERIAL = process.env.RODIN_MATERIAL || 'PBR'
 export const HUNYUAN_API_BASE = process.env.HUNYUAN_API_BASE || 'http://127.0.0.1:8081'
 export const HUNYUAN_CREATE_PATH = process.env.HUNYUAN_CREATE_PATH || '/send'
 export const HUNYUAN_STATUS_PATH = process.env.HUNYUAN_STATUS_PATH || '/status'
+export const FAL_API_KEY = process.env.FAL_API_KEY || process.env.FAL_KEY
+export const FAL_QUEUE_BASE = process.env.FAL_QUEUE_BASE || 'https://queue.fal.run'
+export const FAL_STORAGE_BASE = process.env.FAL_STORAGE_BASE || 'https://rest.alpha.fal.ai'
+export const FAL_DEFAULT_MODEL = process.env.FAL_DEFAULT_MODEL || 'fal-ai/hunyuan3d/v2'
 export const LOCAL_MODEL_DIR = path.resolve(process.env.LOCAL_MODEL_DIR || '.generated-models')
 export const OUTBOUND_PROXY_AGENT = createProxyAgent()
 

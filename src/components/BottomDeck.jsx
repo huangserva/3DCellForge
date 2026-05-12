@@ -24,6 +24,15 @@ export function BottomDeck({
   const compareTarget = getCell(compareCell, customCells)
   const uploadAccept = generationMode === 'local' ? '.glb,.gltf,model/gltf-binary,model/gltf+json' : 'image/*,.glb,.gltf,model/gltf-binary,model/gltf+json'
 
+  function handleGenerationPillsWheel(event) {
+    const target = event.currentTarget
+    const canScroll = target.scrollWidth > target.clientWidth
+    if (!canScroll) return
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
+    target.scrollLeft += event.deltaY
+    event.preventDefault()
+  }
+
   function handleMicroscopeSelect(item) {
     setSelectedMicroscope(item.label)
     onNotify(item.note)
@@ -38,7 +47,7 @@ export function BottomDeck({
         </header>
         <div className="generation-mode-row">
           <span>Generate Mode</span>
-          <div className="generation-mode-pills">
+          <div className="generation-mode-pills" onWheel={handleGenerationPillsWheel}>
             {GENERATION_MODE_OPTIONS.map((mode) => (
               <button
                 key={mode.id}

@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  FAL_MODEL_IDS,
   GENERATION_MODE_IDS,
   GENERATION_PROVIDER_IDS,
   SETTINGS_STORAGE_VERSION,
@@ -16,6 +17,7 @@ export function normalizeSettings(value) {
   if (stored.settingsVersion !== SETTINGS_STORAGE_VERSION) {
     next.generationProvider = GENERATION_PROVIDER_IDS.has(stored.generationProvider) ? stored.generationProvider : DEFAULT_SETTINGS.generationProvider
     next.generationMode = GENERATION_MODE_IDS.has(storedMode) ? storedMode : DEFAULT_SETTINGS.generationMode
+    next.falModelId = FAL_MODEL_IDS.has(stored.falModelId) ? stored.falModelId : DEFAULT_SETTINGS.falModelId
   }
 
   if (!GENERATION_PROVIDER_IDS.has(next.generationProvider)) {
@@ -24,6 +26,10 @@ export function normalizeSettings(value) {
 
   if (!GENERATION_MODE_IDS.has(next.generationMode)) {
     next.generationMode = DEFAULT_SETTINGS.generationMode
+  }
+
+  if (!FAL_MODEL_IDS.has(next.falModelId)) {
+    next.falModelId = DEFAULT_SETTINGS.falModelId
   }
 
   next.settingsVersion = SETTINGS_STORAGE_VERSION
