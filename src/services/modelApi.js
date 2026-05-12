@@ -27,7 +27,7 @@ export async function readApiResponse(response) {
 }
 
 export function getProviderPlan(provider) {
-  return provider === 'auto' ? ['tripo', 'rodin', 'hunyuan', 'cinematic'] : [provider || 'tripo']
+  return provider === 'auto' ? ['tripo', 'fal', 'rodin', 'hunyuan', 'cinematic'] : [provider || 'tripo']
 }
 
 export function getProviderLabel(provider) {
@@ -37,11 +37,11 @@ export function getProviderLabel(provider) {
   return GENERATION_PROVIDER_OPTIONS.find((item) => item.id === provider)?.label ?? 'Tripo'
 }
 
-export async function create3dGeneration({ provider, imageDataUrl, fileName, prompt }) {
+export async function create3dGeneration({ provider, imageDataUrl, fileName, prompt, modelId }) {
   const response = await fetch(apiUrl('/api/3d/generate'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ provider, imageDataUrl, fileName, prompt }),
+    body: JSON.stringify({ provider, imageDataUrl, fileName, prompt, modelId }),
   })
 
   return readApiResponse(response)
