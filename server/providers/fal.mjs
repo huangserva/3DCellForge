@@ -4,10 +4,11 @@ import {
   FAL_API_KEY,
   FAL_DEFAULT_MODEL,
   FAL_QUEUE_BASE,
+  FAL_STORAGE_BASE,
   OUTBOUND_PROXY_AGENT,
   hasOutboundProxy,
 } from '../config.mjs'
-import { parseDataUrl } from '../http-utils.mjs'
+import { parseDataUrl, sanitizeFileName } from '../http-utils.mjs'
 import { cacheRemoteModel, hasLocalModel, localModelUrl } from '../model-store.mjs'
 import { findFirstValue, findModelUrl, isSuccessStatus } from '../object-utils.mjs'
 
@@ -24,8 +25,9 @@ export async function createFalTask(payload) {
 
   const modelId = sanitizeFalModelId(payload.modelId || payload.falModelId || FAL_DEFAULT_MODEL)
   const image = parseDataUrl(payload.imageDataUrl)
-  const dataUrl = `data:${image.mime};base64,${image.buffer.toString('base64')}`
-  const input = buildFalInput(modelId, dataUrl, payload)
+  const fileName = sanitizeFalFileName(payload.fileName, image.ext)
+  const fileUrl = await uploadFalImage(image.buffer, image.mime, fileName)
+  const input = buildFalInput(modelId, fileUrl, payload)
   const raw = await falRequest(modelId, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -148,6 +150,51 @@ export function normalizeFalStatus(value) {
   if (status === 'failed' || status === 'error' || status === 'cancelled' || status === 'canceled') return 'failed'
   if (isSuccessStatus(status)) return 'success'
   return status
+}
+
+async function uploadFalImage(buffer, mime, fileName) {
+  const initiate = await falRequestAbsolute(`${FAL_STORAGE_BASE.replace(/\/$/, '')}/storage/upload/initiate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content_type: mime, file_name: fileName }),
+  })
+  const uploadUrl = initiate.upload_url || initiate.uploadUrl
+  const fileUrl = initiate.file_url || initiate.fileUrl
+
+  if (!uploadUrl || !fileUrl) {
+    const error = new Error('Fal storage initiate did not return upload_url and file_url.')
+    error.detail = initiate
+    throw error
+  }
+
+  let response
+  try {
+    response = await undiciFetch(uploadUrl, {
+      method: 'PUT',
+      ...(OUTBOUND_PROXY_AGENT ? { dispatcher: OUTBOUND_PROXY_AGENT } : {}),
+      headers: { 'Content-Type': mime },
+      body: buffer,
+    })
+  } catch (error) {
+    const wrapped = new Error(`Fal storage upload failed: ${error.message}`)
+    wrapped.detail = { uploadUrl, cause: error.cause?.message || error.cause?.code || '' }
+    throw wrapped
+  }
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '')
+    const error = new Error(`Fal storage upload failed with ${response.status}.`)
+    error.status = response.status || 502
+    error.detail = detail.slice(0, 500)
+    throw error
+  }
+
+  return fileUrl
+}
+
+function sanitizeFalFileName(fileName, fallbackExt = 'webp') {
+  const cleaned = sanitizeFileName(fileName || `cell-reference.${fallbackExt}`)
+  return /\.[a-z0-9]+$/i.test(cleaned) ? cleaned : `${cleaned}.${fallbackExt}`
 }
 
 function buildFalInput(modelId, imageUrl, payload) {
