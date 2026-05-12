@@ -21,7 +21,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "three": "^0.184.0",
-    "undici": "^7.25.0"
+    "undici": "^8.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
