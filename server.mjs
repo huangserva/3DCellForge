@@ -1,8 +1,10 @@
 import http from 'node:http'
-import { API_HOST, API_PORT, FAL_API_KEY, HUNYUAN_API_BASE, RODIN_API_KEY, TRIPO_API_KEY } from './server/config.mjs'
+import { readFile } from 'node:fs/promises'
+import { API_HOST, API_PORT, CAPABILITY_ROUTER, FAL_API_KEY, HUNYUAN_API_BASE, RODIN_API_KEY, TRIPO_API_KEY } from './server/config.mjs'
 import { assertLocalDiagnosticsRequest, readJsonBody, sendJson, setCorsHeaders } from './server/http-utils.mjs'
 import { createRequestId, logEvent, readRecentLogs, summarizeError, summarizePayload } from './server/logger.mjs'
-import { importLocalModel, proxyModel, serveLocalModel } from './server/model-store.mjs'
+import { hasLocalModel, importLocalModel, localModelPath, localModelUrl, proxyModel, saveLocalModel, serveLocalModel } from './server/model-store.mjs'
+import { getCapability, listAvailableCapabilities, route } from './server/providers/registry.mjs'
 import { createFalTask, getFalHealth, getFalTask } from './server/providers/fal.mjs'
 import { createHunyuanTask, getHunyuanHealth, getHunyuanTask } from './server/providers/hunyuan.mjs'
 import { createRodinTask, getRodinHealth, getRodinTask } from './server/providers/rodin.mjs'
@@ -37,6 +39,7 @@ const server = http.createServer(async (request, response) => {
     if (request.method === 'GET' && url.pathname === '/api/3d/health') {
       const payload = {
         ok: true,
+        capabilityRouter: CAPABILITY_ROUTER,
         providers: {
           tripo: getTripoHealth(),
           rodin: getRodinHealth(),
@@ -44,6 +47,35 @@ const server = http.createServer(async (request, response) => {
           fal: getFalHealth(),
           vision: getVisionHealth(),
         },
+      }
+      sendJson(response, 200, payload)
+      await logEvent('info', 'http.response', { requestId, path: url.pathname, status: 200, durationMs: Date.now() - startedAt })
+      return
+    }
+
+    // 能力目录：前端据此渲染「要做什么」而不是「用哪家引擎」
+    if (request.method === 'GET' && url.pathname === '/api/3d/capabilities') {
+      const onlyConfigured = url.searchParams.get('configured') === 'true'
+      const payload = {
+        ok: true,
+        capabilityRouter: CAPABILITY_ROUTER,
+        capabilities: listAvailableCapabilities({ onlyConfigured }),
+      }
+      sendJson(response, 200, payload)
+      await logEvent('info', 'http.response', { requestId, path: url.pathname, status: 200, durationMs: Date.now() - startedAt })
+      return
+    }
+
+    // 路由建议：给定能力与偏好，返回排序后的引擎列表
+    if (request.method === 'GET' && url.pathname === '/api/3d/route') {
+      const capability = url.searchParams.get('capability') || 'generate.image-to-model'
+      const prefer = url.searchParams.get('prefer') || 'balanced'
+      const onlyConfigured = url.searchParams.get('configured') !== 'false'
+      const payload = {
+        ok: true,
+        capability,
+        prefer,
+        candidates: route(capability, { prefer, onlyConfigured }),
       }
       sendJson(response, 200, payload)
       await logEvent('info', 'http.response', { requestId, path: url.pathname, status: 200, durationMs: Date.now() - startedAt })
@@ -137,6 +169,22 @@ const server = http.createServer(async (request, response) => {
       return
     }
 
+    // 本地优化：不需要任何 API key，走 gltf-transform
+    if (request.method === 'POST' && url.pathname === '/api/3d/optimize') {
+      const payload = await readJsonBody(request)
+      const result = await runLocalOptimize(payload)
+
+      sendJson(response, 200, result)
+      await logEvent('info', 'model.optimize.success', {
+        requestId,
+        sourceId: payload.modelId,
+        outputId: result.modelId,
+        savedBytes: result.before.bytes - result.after.bytes,
+        durationMs: Date.now() - startedAt,
+      })
+      return
+    }
+
     if (request.method === 'GET' && url.pathname.startsWith('/api/3d/local-model/')) {
       await serveLocalModel(url, response)
       await logEvent('info', 'model.local.success', { requestId, path: url.pathname, durationMs: Date.now() - startedAt })
@@ -174,7 +222,8 @@ const server = http.createServer(async (request, response) => {
 })
 
 server.listen(API_PORT, API_HOST, () => {
-  console.log(`Bio demo API running at http://${API_HOST}:${API_PORT}`)
+  console.log(`Forge3D API running at http://${API_HOST}:${API_PORT}`)
+  console.log(`Capability router: ${CAPABILITY_ROUTER ? 'on' : 'off (legacy dispatch)'}`)
   console.log(TRIPO_API_KEY ? 'Tripo API key loaded from environment.' : 'TRIPO_API_KEY is missing. Add it to .env.local.')
   console.log(RODIN_API_KEY ? 'Rodin API key loaded from environment.' : 'RODIN_API_KEY is missing. Add it to .env.local.')
   console.log(FAL_API_KEY ? 'Fal API key loaded from environment.' : 'FAL_API_KEY is missing. Add it to .env.local.')
@@ -194,15 +243,85 @@ server.listen(API_PORT, API_HOST, () => {
 })
 
 function createGenerationTask(provider, payload) {
+  if (!CAPABILITY_ROUTER) return createLegacyTask(provider, payload)
+
+  const capability = payload.capability || 'generate.image-to-model'
+  let providerId = provider
+
+  // 未指定引擎、或显式给了偏好时，按偏好路由挑最优
+  if (!providerId || payload.prefer) {
+    const candidates = route(capability, { prefer: payload.prefer || 'balanced', onlyConfigured: true })
+    if (!candidates.length) {
+      throw Object.assign(new Error(`No configured provider supports "${capability}".`), { status: 503 })
+    }
+    providerId = candidates[0].providerId
+  }
+
+  const entry = getCapability(providerId, capability)
+  if (!entry) {
+    throw Object.assign(new Error(`Provider "${providerId}" does not support "${capability}".`), { status: 400 })
+  }
+
+  return entry.create(payload)
+}
+
+function getGenerationTask(provider, taskId) {
+  if (!CAPABILITY_ROUTER) return getLegacyTask(provider, taskId)
+
+  const entry = getCapability(provider || DEFAULT_GENERATION_PROVIDER, 'generate.image-to-model')
+  if (!entry) return getLegacyTask(provider, taskId)
+
+  return entry.get(taskId)
+}
+
+// —— 原有路径，完整保留。CAPABILITY_ROUTER=off 时走这里，任何时刻都可回退。——
+function createLegacyTask(provider, payload) {
   if (provider === 'hunyuan') return createHunyuanTask(payload)
   if (provider === 'fal') return createFalTask(payload)
   if (provider === 'tripo') return createTripoTask(payload)
   return createRodinTask(payload)
 }
 
-function getGenerationTask(provider, taskId) {
+function getLegacyTask(provider, taskId) {
   if (provider === 'hunyuan') return getHunyuanTask(taskId)
   if (provider === 'fal') return getFalTask(taskId)
   if (provider === 'tripo') return getTripoTask(taskId)
   return getRodinTask(taskId)
+}
+
+/**
+ * 本地优化：读一个已缓存的模型，跑 gltf-transform，存成新文件。
+ * 不需要任何 API key —— 这是「本地零成本模式」的第一块砖。
+ *
+ * 只接受 modelId（本地缓存里的 id），不接受任意 URL —— 否则就成了
+ * 一个可以被利用来让服务器下载任意文件的 SSRF 入口。
+ */
+async function runLocalOptimize({ modelId, ratio = 1, compress = 'meshopt', error = 0.001 } = {}) {
+  if (!modelId) {
+    throw Object.assign(new Error('modelId is required.'), { status: 400 })
+  }
+
+  if (!(await hasLocalModel(modelId, 'glb'))) {
+    throw Object.assign(new Error(`本地没有这个模型：${modelId}`), { status: 404 })
+  }
+
+  // 惰性加载：gltf-transform + draco3d + meshoptimizer 体积不小，
+  // 放启动路径上会白白拖慢冷启动，只在真要优化时才拉进来
+  const { optimizeGlb } = await import('./server/optimize.mjs')
+  const source = await readFile(localModelPath(modelId, 'glb'))
+  const result = await optimizeGlb(source, { ratio, compress, error })
+
+  const outputId = `${modelId}-opt`
+  await saveLocalModel(outputId, Buffer.from(result.buffer), 'glb')
+
+  return {
+    ok: true,
+    modelId: outputId,
+    modelUrl: localModelUrl(outputId, 'glb'),
+    sourceId: modelId,
+    steps: result.steps,
+    before: result.before,
+    after: result.after,
+    savedPercent: Math.round((1 - result.after.bytes / Math.max(1, result.before.bytes)) * 100),
+  }
 }

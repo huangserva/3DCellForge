@@ -62,6 +62,7 @@ export function CenterStage({
   crossSection,
   setCrossSection,
   renderQuality,
+  environment = 'studio',
   screenshotScale = 1,
   customCells,
   generationHistory = [],
@@ -245,6 +246,7 @@ export function CenterStage({
               presentationMode={demoMode}
               motionProfile={sceneProfile.id}
               viewMode={effectiveViewMode}
+              environment={environment}
             />
           ) : (
             <>
@@ -263,6 +265,7 @@ export function CenterStage({
                   proofMode={effectiveProofMode}
                   viewMode={effectiveViewMode}
                   renderQuality={renderQuality}
+                  environment={environment}
                   presentationMode={demoMode}
                   motionProfile={sceneProfile.id}
                   onSelectOrganelle={setSelectedOrganelle}

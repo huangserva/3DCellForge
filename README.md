@@ -1,10 +1,12 @@
-# 3D Model Studio
+# Forge3D
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-AI-powered interactive 3D model generation, inspection, and presentation studio.
+Open-source, self-hostable 3D asset workbench. It turns scattered 3D generation APIs into one controllable post-processing pipeline — neutral, offline-capable, and batch-ready.
 
-3D Model Studio is a React + Three.js prototype for turning uploaded reference images or GLB files into a polished interactive 3D workspace. It supports live WebGL orbit controls, a left model library / center stage / right tools workbench, screenshots, GLB export, collapsed upload history, demo presentation mode, a generation queue, and optional image-to-3D providers for generating real 3D models from uploaded reference images.
+Forge3D is a React + Three.js workbench for turning uploaded reference images or GLB files into a polished interactive 3D workspace. It supports live WebGL orbit controls, a left model library / center stage / right tools workbench, screenshots, GLB export, collapsed upload history, demo presentation mode, a generation queue, and optional image-to-3D providers for generating real 3D models from uploaded reference images.
+
+> **Engine-neutral by design.** Forge3D is not tied to any single 3D vendor. Capabilities are declared in a registry, so adding an engine is a one-line change and the UI picks it up automatically. See [Capability Registry](#capability-registry) below.
 
 ## Demo
 
@@ -18,7 +20,7 @@ Open the demo video: [Demo MP4](docs/demo/3DCellForge-demo-2026-05-10.mp4)
 - Three-column workbench: Model Library on the left, WebGL stage in the center, asset/generation tools on the right.
 - Drag to rotate, scroll to zoom, isolate structure parts, inspect model details, and export the current scene.
 - Object-aware inspector with inferred category, source, provider state, material focus, demo value, and tags for vehicles, aircraft, vessels, products, artifacts, and organic specimens.
-- Model quality score for generated GLBs, including file size, triangle count, texture count, and demo readiness.
+- Model quality breakdown across six signals: watertightness, PBR channels, UV coverage, texture resolution, triangle budget, and topological cleanliness. Each check reports *why*, so a low score is actionable — not a mystery number.
 - Demo Mode for screenshots and screen recordings: hides side panels, uses object-aware cinematic camera paths, and shows a clean presentation overlay.
 - Productized Model Library drawer with source thumbnails, provider/status, task id, GLB URL actions, comparison, and delete controls.
 - Saved Assets stays collapsed by default, while the active generated/imported asset stays pinned and clickable.
@@ -28,6 +30,80 @@ Open the demo video: [Demo MP4](docs/demo/3DCellForge-demo-2026-05-10.mp4)
 - Cached demo GLB models for offline-friendly screenshots and demos.
 - Auxiliary Khronos glTF reference models for GLB loader and PBR material checks.
 - API key stays server-side in `.env.local`; it is never exposed to the frontend bundle.
+
+## Capability Registry
+
+Instead of picking a vendor, you pick **what you want to do** and a **preference** (speed / quality / cost). The registry maps that to the best engine available.
+
+```js
+// server/providers/registry.mjs
+'generate.image-to-model': {
+  create: lazyCall(loadTripo, 'createTripoTask'),
+  get:    lazyCall(loadTripo, 'getTripoTask'),
+  perf:   { speed: 9, quality: 8, cost: 3 },
+},
+```
+
+Consequences worth knowing:
+
+- **Adding an engine is one entry.** No changes to dispatch, frontend config, or UI.
+- **Routing is testable.** `route(capability, { prefer })` is pure and covered by unit tests.
+- **Declared-but-unimplemented capabilities are hidden.** Registering `edit.prompt` before wiring it up won't surface a broken option in the UI.
+- **Providers load lazily.** A missing SDK or a dead local server takes down that one engine, not the router.
+
+Two HTTP endpoints expose it:
+
+```bash
+GET /api/3d/capabilities            # what can I do here, and with which engines
+GET /api/3d/route?capability=generate.image-to-model&prefer=fastest
+```
+
+### Comparing engines
+
+`scripts/compare.mjs` runs one reference image through every configured engine for a capability and prints a side-by-side table. It doubles as the acceptance test for the registry — if a provider claims a capability and misbehaves, this surfaces it immediately.
+
+```bash
+npm run compare -- --image ./reference.png
+npm run compare -- --image ./reference.png --providers tripo,fal --prefer fastest
+npm run compare -- --dry-run            # list candidates without calling anything
+```
+
+### Local optimization
+
+`postprocess.optimize` runs entirely on your machine via [gltf-transform](https://gltf-transform.dev/) — **no API key, no upload, no cost**. This is the first building block of the offline-capable mode.
+
+```bash
+npm run optimize -- ./model.glb                                   # report only
+npm run optimize -- ./model.glb --ratio 0.5 -o ./model.small.glb   # write result
+```
+
+Pipeline: `dedup → prune → weld → simplify → compress`. Order matters — dedup before prune, weld before simplify, compress last.
+
+Measured on the 57.7 MB sample asset in `public/generated-models/`:
+
+| ratio | compress | size | triangles | time |
+|---|---|---|---|---|
+| 1.0 | meshopt | 12.4 MB (−78%) | unchanged | 3.3s |
+| 1.0 | draco | 7.5 MB (−87%) | unchanged | 5.2s |
+| 0.5 | meshopt | 7.7 MB (−87%) | −50% | 3.3s |
+| 0.5 | draco | **5.3 MB (−91%)** | −50% | 4.4s |
+| 0.25 | meshopt | 5.2 MB (−91%) | −75% | 3.4s |
+
+Draco compresses harder; meshopt decodes faster. Start with meshopt unless size is critical.
+
+Texture compression (KTX2/WebP) is deliberately not enabled — it needs `sharp`, a native dependency. That's the biggest remaining win; see the TODO in `server/optimize.mjs`.
+
+### Offline by design
+
+Three things fetch from the network in a naive setup. All three are handled locally here:
+
+- **Draco decoder** — drei's `useGLTF` defaults to `gstatic.com`. `npm run decoders` copies three's own decoders into `public/decoders/` (wired via `predev`/`prebuild`).
+- **IBL environment** — HDRIs normally come from a CDN. Every preset in `src/viewer/environments.js` is generated from `Lightformer` geometry instead.
+- **Optimization** — runs locally, as above.
+
+### Feature flag
+
+`CAPABILITY_ROUTER=off` in `.env.local` falls back to the original provider dispatch. The legacy path is kept intact, so the registry refactor is always one line away from being bypassed.
 
 ## Tech Stack
 

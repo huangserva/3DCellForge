@@ -12,6 +12,8 @@ node_modules
 dist
 dist-ssr
 .generated-models
+# 3D 解码器由 npm run decoders 从 node_modules 复制而来，是生成物不是源码
+public/decoders
 test-results
 playwright-report
 *.local

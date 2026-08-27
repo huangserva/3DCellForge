@@ -1,8 +1,9 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { ContactShadows, Line, OrbitControls, RoundedBox, useGLTF, useTexture } from '@react-three/drei'
+import { ContactShadows, Environment, Lightformer, Line, OrbitControls, RoundedBox, useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { CELL_BODY, CELL_TYPES, ORGANELLES } from '../domain/cellData.js'
+import { getEnvironmentPreset } from './environments.js'
 import { getModelCellId } from '../domain/cellCatalog.js'
 import { exportObjectAsGlb } from '../lib/downloads.js'
 import { buildLayeredPngVisual, createImageReliefGeometry } from '../lib/imagePipeline.js'
@@ -144,6 +145,46 @@ function PresentationMotionRig({
   })
 
   return null
+}
+
+/**
+ * 本地光棚（IBL）。
+ *
+ * 用 drei <Environment> 传 children 的形式：drei 会把这些几何体渲进一张 cubemap
+ * 当环境贴图，全程本地完成，不会从任何 CDN 拉 HDRI —— 对主打「可自托管」的
+ * 工具来说这个取舍很重要。
+ *
+ * 不用 <Environment preset>：preset 会从 pmndrs CDN 取 HDRI，离线跑不了。
+ * 也不直接改 scene.environment：react-hooks/immutability 不允许改写 hook 返回值。
+ *
+ * 没有它，Tripo / Hunyuan3D 输出的 PBR 材质会发灰 —— 金属度高的表面没有
+ * 环境可反射，粗糙度也体现不出来。
+ *
+ * 预设定义在 ./environments.js，全部本地生成，可零延迟切换。
+ */
+function StudioEnvironment({ preset = 'studio', background = false }) {
+  const config = getEnvironmentPreset(preset)
+
+  return (
+    <Environment resolution={256} background={background} environmentIntensity={config.intensity}>
+      <mesh scale={60}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial color={config.shell} side={THREE.BackSide} />
+      </mesh>
+      {config.lights.map((light, index) => (
+        // key 带上 config.id，切换预设时整组重建，保证 cubemap 重新渲染
+        <Lightformer
+          key={`${config.id}-${index}`}
+          form={light.form}
+          intensity={light.intensity}
+          color={light.color}
+          position={light.position}
+          scale={light.scale}
+          target={[0, 0, 0]}
+        />
+      ))}
+    </Environment>
+  )
 }
 
 function PresentationEnvironment({ profile }) {
@@ -1192,7 +1233,7 @@ function CinematicReliefSpecimen({ imageUrl, autoRotate, onSelect, viewMode = 'l
   )
 }
 
-function CinematicReliefScene({ imageUrl, autoRotate, presentationMode, motionProfile, onSelectOrganelle, viewMode }) {
+function CinematicReliefScene({ imageUrl, autoRotate, presentationMode, motionProfile, onSelectOrganelle, viewMode, environment = 'studio' }) {
   const presentationRoot = useRef(null)
 
   return (
@@ -1208,11 +1249,12 @@ function CinematicReliefScene({ imageUrl, autoRotate, presentationMode, motionPr
       }}
     >
       {!presentationMode && <color attach="background" args={['#f6efdf']} />}
-      <ambientLight intensity={0.84} />
-      <directionalLight castShadow position={[3.6, 4.8, 5.8]} intensity={3.8} color="#fff7e8" shadow-mapSize={[1024, 1024]} />
-      <directionalLight position={[-4.2, 2.1, 3.2]} intensity={1.55} color="#d6eef8" />
-      <pointLight position={[0.8, -2.6, 2.6]} intensity={1.3} color="#f4a6c8" />
-      <pointLight position={[-2.8, 1.2, 1.8]} intensity={0.92} color="#bde8b0" />
+      <StudioEnvironment preset={environment} />
+      <ambientLight intensity={0.16} />
+      <directionalLight castShadow position={[3.6, 4.8, 5.8]} intensity={1.5} color="#fff7e8" shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-4.2, 2.1, 3.2]} intensity={0.55} color="#d6eef8" />
+      <pointLight position={[0.8, -2.6, 2.6]} intensity={0.45} color="#f4a6c8" />
+      <pointLight position={[-2.8, 1.2, 1.8]} intensity={0.32} color="#bde8b0" />
       {presentationMode && <PresentationEnvironment profile={motionProfile} />}
       <PresentationMotionRig
         enabled={presentationMode}
@@ -1230,7 +1272,7 @@ function CinematicReliefScene({ imageUrl, autoRotate, presentationMode, motionPr
   )
 }
 
-export function CinematicLayerVisual({ imageUrl, selectedOrganelle, onSelectOrganelle, autoRotate, presentationMode = false, motionProfile = 'specimen', viewMode = 'layers' }) {
+export function CinematicLayerVisual({ imageUrl, selectedOrganelle, onSelectOrganelle, autoRotate, presentationMode = false, motionProfile = 'specimen', viewMode = 'layers', environment = 'studio' }) {
   const [pointer, setPointer] = useState({ x: 0, y: 0 })
   const [visualState, setVisualState] = useState(null)
   const visual = visualState?.imageUrl === imageUrl ? visualState.visual : null
@@ -1290,7 +1332,7 @@ export function CinematicLayerVisual({ imageUrl, selectedOrganelle, onSelectOrga
     >
       {!webglAvailable && <div className="cinematic-depth-field" />}
       {webglAvailable ? (
-        <CinematicReliefScene imageUrl={imageUrl} autoRotate={autoRotate} presentationMode={presentationMode} motionProfile={motionProfile} onSelectOrganelle={onSelectOrganelle} viewMode={viewMode} />
+        <CinematicReliefScene imageUrl={imageUrl} autoRotate={autoRotate} presentationMode={presentationMode} motionProfile={motionProfile} onSelectOrganelle={onSelectOrganelle} viewMode={viewMode} environment={environment} />
       ) : (
         <div
           className={`layered-png-stage motion-${motionProfile} ${autoRotate ? 'auto' : ''}`}
@@ -1332,7 +1374,7 @@ export function CinematicLayerVisual({ imageUrl, selectedOrganelle, onSelectOrga
   )
 }
 
-export function CellScene({ selectedCell, modelCellId, referenceImageUrl, generatedModelUrl, selectedOrganelle, crossSection, autoRotate, hideOthers, proofMode, viewMode = 'layers', renderQuality, presentationMode = false, motionProfile = 'specimen', onSelectOrganelle, onExporterReady = null }) {
+export function CellScene({ selectedCell, modelCellId, referenceImageUrl, generatedModelUrl, selectedOrganelle, crossSection, autoRotate, hideOthers, proofMode, viewMode = 'layers', renderQuality, environment = 'studio', presentationMode = false, motionProfile = 'specimen', onSelectOrganelle, onExporterReady = null }) {
   const isPlant = modelCellId === 'plant'
   const presentationRoot = useRef(null)
   const exportRoot = useRef(null)
@@ -1353,11 +1395,12 @@ export function CellScene({ selectedCell, modelCellId, referenceImageUrl, genera
       fallback={<CellFallback selectedCell={selectedCell} modelCellId={modelCellId} referenceImageUrl={referenceImageUrl} selectedOrganelle={selectedOrganelle} onSelectOrganelle={onSelectOrganelle} />}
     >
       {!presentationMode && <color attach="background" args={['#f5efdf']} />}
-      <ambientLight intensity={0.82} />
-      <directionalLight castShadow position={[4, 5, 5]} intensity={3.4} color="#fff7ed" shadow-mapSize={[1024, 1024]} />
-      <directionalLight position={[-4.5, 2.6, 3]} intensity={1.65} color="#dbeafe" />
-      <pointLight position={[0, -3.2, 2.4]} intensity={1.35} color="#f9a8d4" />
-      <pointLight position={[-2.4, 1.2, 1.6]} intensity={0.75} color="#b8f7a6" />
+      <StudioEnvironment preset={environment} />
+      <ambientLight intensity={0.14} />
+      <directionalLight castShadow position={[4, 5, 5]} intensity={1.35} color="#fff7ed" shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-4.5, 2.6, 3]} intensity={0.6} color="#dbeafe" />
+      <pointLight position={[0, -3.2, 2.4]} intensity={0.5} color="#f9a8d4" />
+      <pointLight position={[-2.4, 1.2, 1.6]} intensity={0.28} color="#b8f7a6" />
       {proofMode && <ProofRig />}
       {presentationMode && <PresentationEnvironment profile={motionProfile} />}
       <PresentationMotionRig enabled={presentationMode} motionProfile={motionProfile} targetRef={presentationRoot} />

@@ -1149,6 +1149,7 @@ function App() {
               crossSection={crossSection}
               setCrossSection={setCrossSection}
               renderQuality={settings.quality}
+              environment={settings.environment}
               screenshotScale={settings.screenshotScale}
               customCells={customCells}
               generationHistory={generationHistory}

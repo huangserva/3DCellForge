@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # three 和 r3f 生态迭代快，每周检查一次
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # 把 three 生态的更新合并成一个 PR，避免一次来七八个
+      three-js:
+        patterns:
+          - "three"
+          - "@react-three/*"
+      dev-deps:
+        dependency-type: "development"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly

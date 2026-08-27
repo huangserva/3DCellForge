@@ -8,6 +8,7 @@ import {
   SETTINGS_STORAGE_VERSION,
   UI_STATE_STORAGE_VERSION,
 } from '../config/appConfig.js'
+import { DEFAULT_ENVIRONMENT_PRESET, ENVIRONMENT_PRESET_IDS } from '../viewer/environments.js'
 import { MICROSCOPE_IMAGES } from './cellData.js'
 import { getCellProfile } from './cellCatalog.js'
 
@@ -40,6 +41,12 @@ export function normalizeSettings(value) {
   if (!LANGUAGE_IDS.has(next.language)) {
     next.language = DEFAULT_SETTINGS.language
   }
+
+  // 环境预设是后加的，老用户的存储里没有这个字段，必须独立归一化，
+  // 不能放进上面那个 settingsVersion 分支 —— 否则只有升版本的人才有值。
+  next.environment = ENVIRONMENT_PRESET_IDS.has(next.environment)
+    ? next.environment
+    : DEFAULT_ENVIRONMENT_PRESET
 
   next.settingsVersion = SETTINGS_STORAGE_VERSION
   return next

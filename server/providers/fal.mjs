@@ -6,27 +6,39 @@ import { parseDataUrl } from '../http-utils.mjs'
 import { cacheRemoteModelAs, hasLocalModel, localModelUrl } from '../model-store.mjs'
 import { isSuccessStatus } from '../object-utils.mjs'
 
+/**
+ * Fal 模型定义。必须与前端 src/config/appConfig.js 的 FAL_MODEL_OPTIONS 保持一致，
+ * 否则前端给出的选项会被 normalizeFalModelId 静默回退掉。
+ *
+ * imageField    该模型接收图片的字段名
+ * unverified    模型 id 或 imageField 是依同系列惯例推断的，未经实测
+ *
+ * 只收录 image → textured mesh 的模型。文生 3D（Meshy v7）和输出点云的
+ * VGGT 1B 不在此列 —— 它们的数据形状不同，需要各自的 UI 与结果解析。
+ */
 export const FAL_MODEL_DEFINITIONS = [
   {
-    id: 'fal-ai/hunyuan3d/v2',
-    label: 'Hunyuan3D v2',
-    imageField: 'input_image_url',
+    id: 'fal-ai/hitem3d/hi3d/v3.0/image-to-3d',
+    label: 'Hi3D V3.0',
+    imageField: 'image_url',
     defaults: {},
-    supportsSeed: true,
+    supportsSeed: false,
   },
   {
-    id: 'fal-ai/trellis',
-    label: 'TRELLIS',
+    id: 'fal-ai/trellis-2',
+    label: 'TRELLIS.2 (4B, MIT)',
     imageField: 'image_url',
     defaults: { texture_size: '1024' },
     supportsSeed: true,
+    unverified: true,
   },
   {
-    id: 'fal-ai/triposr',
-    label: 'TripoSR',
-    imageField: 'image_url',
-    defaults: { do_remove_background: true, output_format: 'glb' },
-    supportsSeed: false,
+    id: 'fal-ai/hunyuan3d/v3.1/pro/image-to-3d',
+    label: 'Hunyuan3D 3.1 Pro',
+    imageField: 'input_image_url',
+    defaults: {},
+    supportsSeed: true,
+    unverified: true,
   },
   {
     id: 'tripo3d/tripo/v2.5/image-to-3d',
@@ -34,6 +46,13 @@ export const FAL_MODEL_DEFINITIONS = [
     imageField: 'image_url',
     defaults: { orientation: 'align_image', pbr: true, texture: 'standard' },
     supportsSeed: true,
+  },
+  {
+    id: 'fal-ai/triposr',
+    label: 'TripoSR（草稿）',
+    imageField: 'image_url',
+    defaults: { do_remove_background: true, output_format: 'glb' },
+    supportsSeed: false,
   },
   {
     id: 'fal-ai/hyper3d/rodin',
@@ -48,10 +67,26 @@ export const FAL_MODEL_DEFINITIONS = [
     supportsPrompt: true,
     supportsSeed: true,
   },
+  {
+    id: 'fal-ai/hunyuan3d/v2',
+    label: 'Hunyuan3D v2（旧版回退）',
+    imageField: 'input_image_url',
+    defaults: {},
+    supportsSeed: true,
+  },
+  {
+    id: 'fal-ai/trellis',
+    label: 'TRELLIS（旧版回退）',
+    imageField: 'image_url',
+    defaults: { texture_size: '1024' },
+    supportsSeed: true,
+  },
 ]
 
 export const FAL_MODEL_IDS = new Set(FAL_MODEL_DEFINITIONS.map((model) => model.id))
-const FALLBACK_FAL_MODEL = FAL_MODEL_DEFINITIONS[0].id
+// 显式指定回退目标，不取列表首项 —— 避免调整顺序时默认值被意外改掉。
+// 用已验证过的 hunyuan3d/v2 兜底，而不是列表里排第一的新模型。
+const FALLBACK_FAL_MODEL = 'fal-ai/hunyuan3d/v2'
 let falClient = null
 
 export function getFalHealth() {

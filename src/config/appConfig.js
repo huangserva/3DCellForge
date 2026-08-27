@@ -1,3 +1,8 @@
+import { DEFAULT_ENVIRONMENT_PRESET } from '../viewer/environments.js'
+
+// 注意：这些 key 仍沿用 bio-demo-* 前缀（cell 时代遗留），不能轻易改。
+// 改了会让已安装用户的设置、画廊、历史、笔记全部丢失 —— 2624 star 意味着
+// 有真实用户在跑。要改名必须配一次性迁移，见 preferences.js 的 migrateLegacyKeys。
 export const SETTINGS_STORAGE_KEY = 'bio-demo-settings'
 export const GALLERY_STORAGE_KEY = 'bio-demo-gallery'
 export const GENERATION_HISTORY_STORAGE_KEY = 'bio-demo-generation-history'
@@ -7,17 +12,81 @@ const VITE_ENV = import.meta.env || {}
 export const SETTINGS_STORAGE_VERSION = 5
 export const UI_STATE_STORAGE_KEY = 'bio-demo-ui-state'
 export const UI_STATE_STORAGE_VERSION = 1
+// Fal 模型目录（2026-08 更新）。
+// 必须与服务端 server/providers/fal.mjs 的 FAL_MODEL_DEFINITIONS 保持一致，
+// 否则前端给出的选项会被服务端的 normalizeFalModelId 静默回退掉。
+//
+// perf 字段供后续「能力路由」使用：按 speed / quality / cost 偏好自动挑引擎。
+// verified: false 表示模型 id 或请求参数是依据厂商公开命名推断的，接入前需实测确认。
+//
+// 只收录 image → textured mesh。以下两类刻意不收，因为它们的数据形状不同，
+// 需要各自的 UI 与结果解析，等 Sprint 1 第二批再进：
+//   - 文生 3D（fal-ai/meshy/v7/text-to-3d）
+//   - 输出点云/场景而非网格（fal-ai/vggt-1b）
 export const FAL_MODEL_OPTIONS = [
-  { id: 'fal-ai/hunyuan3d/v2', label: 'Hunyuan3D v2', description: 'Tencent Hunyuan3D v2 through Fal.' },
-  { id: 'fal-ai/trellis', label: 'TRELLIS', description: 'Image-to-3D with textured mesh output.' },
-  { id: 'fal-ai/triposr', label: 'TripoSR', description: 'Fast image reconstruction through Fal.' },
-  { id: 'tripo3d/tripo/v2.5/image-to-3d', label: 'Tripo3D v2.5', description: 'Fal-hosted Tripo3D image-to-3D.' },
-  { id: 'fal-ai/hyper3d/rodin', label: 'Hyper3D Rodin', description: 'Fal-hosted Rodin image-to-3D.' },
+  {
+    id: 'fal-ai/hitem3d/hi3d/v3.0/image-to-3d',
+    label: 'Hi3D V3.0',
+    description: 'Hitem3D。几何精度最佳。',
+    perf: { speed: 7, quality: 9, cost: 5 },
+    verified: true,
+  },
+  {
+    id: 'fal-ai/hunyuan3d/v3.1/pro/image-to-3d',
+    label: 'Hunyuan3D 3.1 Pro',
+    description: '腾讯。纹理与 PBR 质量最佳，支持多视图输入。',
+    perf: { speed: 6, quality: 9, cost: 5 },
+    verified: false,
+  },
+  {
+    id: 'fal-ai/trellis-2',
+    label: 'TRELLIS.2 (4B, MIT)',
+    description: '微软。MIT 许可，单卡 24GB 约 20s 出 1536 分辨率，可商用。',
+    perf: { speed: 8, quality: 8, cost: 2 },
+    verified: false,
+  },
+  {
+    id: 'tripo3d/tripo/v2.5/image-to-3d',
+    label: 'Tripo3D v2.5',
+    description: 'Fal 托管的 Tripo3D。项目原本就在用的稳定选项。',
+    perf: { speed: 8, quality: 7, cost: 3 },
+    verified: true,
+  },
+  {
+    id: 'fal-ai/triposr',
+    label: 'TripoSR（草稿）',
+    description: '亚秒级草稿，适合先出形再精修。',
+    perf: { speed: 10, quality: 4, cost: 1 },
+    verified: true,
+  },
+  {
+    id: 'fal-ai/hyper3d/rodin',
+    label: 'Hyper3D Rodin',
+    description: '电影级 hero 资产，最贵。',
+    perf: { speed: 3, quality: 10, cost: 9 },
+    verified: true,
+  },
+  {
+    id: 'fal-ai/hunyuan3d/v2',
+    label: 'Hunyuan3D v2（旧版回退）',
+    description: '上一代，保留作兼容回退。',
+    perf: { speed: 6, quality: 7, cost: 3 },
+    verified: true,
+  },
+  {
+    id: 'fal-ai/trellis',
+    label: 'TRELLIS（旧版回退）',
+    description: '上一代结构化 3D latent。',
+    perf: { speed: 8, quality: 7, cost: 2 },
+    verified: true,
+  },
 ]
 export const FAL_MODEL_IDS = new Set(FAL_MODEL_OPTIONS.map((option) => option.id))
-export const DEFAULT_FAL_MODEL = FAL_MODEL_OPTIONS[0].id
+// 显式指定，避免列表顺序变动时默认值被意外改掉
+export const DEFAULT_FAL_MODEL = 'fal-ai/hitem3d/hi3d/v3.0/image-to-3d'
 export const DEFAULT_SETTINGS = {
   quality: 'balanced',
+  environment: DEFAULT_ENVIRONMENT_PRESET,
   compactUi: false,
   generationProvider: 'rodin',
   generationMode: 'rodin',

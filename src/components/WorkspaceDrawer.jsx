@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Box, CheckCircle2, Clock3, Copy, Download, Edit3, Image, Layers3, RefreshCw, RotateCcw, Trash2, X } from 'lucide-react'
 
+import { DEFAULT_ENVIRONMENT_PRESET, ENVIRONMENT_PRESETS, getEnvironmentPreset } from '../viewer/environments.js'
 import { FAL_MODEL_OPTIONS, GENERATION_MODE_OPTIONS, LANGUAGE_OPTIONS, SCREENSHOT_SCALE_OPTIONS } from '../config/appConfig.js'
 import { CELL_TYPES, WORKSPACE_PANELS } from '../domain/cellData.js'
 import { getCell, getCellProfile, getOrganelleDetail } from '../domain/cellCatalog.js'
@@ -495,6 +496,27 @@ export function WorkspaceDrawer({
                 </button>
               ))}
             </div>
+          </div>
+          <div className="settings-row">
+            <span>
+              <strong>Environment</strong>
+              <small>
+                {getEnvironmentPreset(settings.environment).description}
+                <br />
+                全部本地生成，不下载 HDRI。
+              </small>
+            </span>
+            <select
+              className="settings-select"
+              value={settings.environment || DEFAULT_ENVIRONMENT_PRESET}
+              onChange={(event) => onUpdateSettings({ ...settings, environment: event.target.value })}
+            >
+              {ENVIRONMENT_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}
+                </option>
+              ))}
+            </select>
           </div>
           <label className="settings-row">
             <span>

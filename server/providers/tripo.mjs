@@ -1,19 +1,35 @@
 import { createHash, createHmac } from 'node:crypto'
 import path from 'node:path'
 import { fetch as undiciFetch } from 'undici'
-import { OUTBOUND_PROXY_AGENT, TRIPO_API_BASE, TRIPO_API_KEY, TRIPO_MODEL_VERSION, hasOutboundProxy } from '../config.mjs'
+import { OUTBOUND_PROXY_AGENT, TRIPO_API_BASE, TRIPO_API_KEY, TRIPO_API_VERSION, TRIPO_MODEL_VERSION, hasOutboundProxy } from '../config.mjs'
 import { parseDataUrl, sanitizeFileName } from '../http-utils.mjs'
 import { cacheRemoteModel, hasLocalModel, localModelUrl, shouldUseProxy } from '../model-store.mjs'
 import { findFirstValue, findModelUrl, isSuccessStatus } from '../object-utils.mjs'
+import { createTripoV3Task, getTripoV3Health, getTripoV3Task } from './tripo-v3.mjs'
+
+const USE_V3 = TRIPO_API_VERSION !== 'v2'
 
 export function getTripoHealth() {
-  return {
+  const base = USE_V3 ? getTripoV3Health() : {
     configured: Boolean(TRIPO_API_KEY),
+    apiVersion: 'v2',
+    base: TRIPO_API_BASE,
     modelVersion: TRIPO_MODEL_VERSION,
   }
+
+  return { ...base, v3Available: true }
 }
 
-export async function createTripoTask(payload) {
+// v3 为默认路径；TRIPO_API_VERSION=v2 回退到已验证的旧实现
+export function createTripoTask(payload) {
+  return USE_V3 ? createTripoV3Task(payload) : createTripoV2Task(payload)
+}
+
+export function getTripoTask(taskId) {
+  return USE_V3 ? getTripoV3Task(taskId) : getTripoV2Task(taskId)
+}
+
+async function createTripoV2Task(payload) {
   requireTripoKey()
   const image = parseDataUrl(payload.imageDataUrl)
   const fileName = sanitizeFileName(payload.fileName || `cell-reference.${image.ext}`)
@@ -27,7 +43,7 @@ export async function createTripoTask(payload) {
   }
 }
 
-export async function getTripoTask(taskId) {
+async function getTripoV2Task(taskId) {
   if (!taskId) {
     throw Object.assign(new Error('taskId is required.'), { status: 400 })
   }

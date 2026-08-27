@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 同一分支的新推送会取消掉还在跑的旧任务，省 CI 时长
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: lint + test + build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 前端要用 three 自带的 draco/basis 解码器，构建前先拷到 public/
+      - name: Copy 3D decoders
+        run: npm run decoders
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # 体积基线：主 bundle 超过阈值就报警，避免悄悄膨胀
+      - name: Check bundle size
+        run: |
+          SIZE=$(find dist/assets -name "index-*.js" -exec stat -c%s {} \; | head -1)
+          echo "main bundle: $((SIZE / 1024)) KB"
+          if [ "$SIZE" -gt 2097152 ]; then
+            echo "::warning::主 bundle 超过 2 MB，考虑代码分割"
+          fi
