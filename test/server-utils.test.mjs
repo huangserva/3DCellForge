@@ -4,6 +4,7 @@ import { assertLocalDiagnosticsRequest, parseDataUrl, sanitizeFileName } from '.
 import { getModelExtension, shouldAttachTripoAuth, validateModelBuffer } from '../server/model-store.mjs'
 import { findFirstValue, findModelUrl, isSuccessStatus } from '../server/object-utils.mjs'
 import { buildFalInput, decodeFalTaskId, encodeFalTaskId, findFalModelFile, normalizeFalModelId, normalizeFalStatus } from '../server/providers/fal.mjs'
+import { findAtlasModelUrl, normalizeAtlasStatus } from '../server/providers/atlas.mjs'
 import { decodeRodinTaskId, encodeRodinTaskId, findRodinDownloadItem, normalizeRodinStatus } from '../server/providers/rodin.mjs'
 import { extractJsonObject, normalizeVisionInsight } from '../server/providers/vision.mjs'
 import { compactCustomCellsForStorage, persistCustomCells } from '../src/domain/cellPersistence.js'
@@ -151,6 +152,26 @@ describe('server utility functions', () => {
         pbr_model: { url: 'https://cdn.example.com/file', content_type: 'model/gltf-binary' },
       }),
       { url: 'https://cdn.example.com/file', ext: 'glb' },
+    )
+  })
+
+  it('normalizes Atlas Cloud statuses and selects GLB outputs', () => {
+    assert.equal(normalizeAtlasStatus('created'), 'queued')
+    assert.equal(normalizeAtlasStatus('processing'), 'processing')
+    assert.equal(normalizeAtlasStatus('completed'), 'success')
+    assert.equal(normalizeAtlasStatus('failed'), 'failed')
+    assert.equal(
+      findAtlasModelUrl({
+        files: [
+          { type: 'PNG', url: 'https://cdn.example.com/preview.png' },
+          { type: 'GLB', url: 'https://cdn.example.com/model-download' },
+        ],
+      }),
+      'https://cdn.example.com/model-download',
+    )
+    assert.equal(
+      findAtlasModelUrl({ outputs: ['https://cdn.example.com/preview.png', 'https://cdn.example.com/model.glb?token=1'] }),
+      'https://cdn.example.com/model.glb?token=1',
     )
   })
 

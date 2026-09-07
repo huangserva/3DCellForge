@@ -1,9 +1,10 @@
 import http from 'node:http'
-import { API_HOST, API_PORT, FAL_API_KEY, HUNYUAN_API_BASE, RODIN_API_KEY, TRIPO_API_KEY } from './server/config.mjs'
+import { API_HOST, API_PORT, ATLASCLOUD_API_KEY, FAL_API_KEY, HUNYUAN_API_BASE, RODIN_API_KEY, TRIPO_API_KEY } from './server/config.mjs'
 import { assertLocalDiagnosticsRequest, readJsonBody, sendJson, setCorsHeaders } from './server/http-utils.mjs'
 import { createRequestId, logEvent, readRecentLogs, summarizeError, summarizePayload } from './server/logger.mjs'
 import { importLocalModel, proxyModel, serveLocalModel } from './server/model-store.mjs'
 import { createFalTask, getFalHealth, getFalTask } from './server/providers/fal.mjs'
+import { createAtlasTask, getAtlasHealth, getAtlasTask } from './server/providers/atlas.mjs'
 import { createHunyuanTask, getHunyuanHealth, getHunyuanTask } from './server/providers/hunyuan.mjs'
 import { createRodinTask, getRodinHealth, getRodinTask } from './server/providers/rodin.mjs'
 import { createTripoTask, getTripoHealth, getTripoTask } from './server/providers/tripo.mjs'
@@ -42,6 +43,7 @@ const server = http.createServer(async (request, response) => {
           rodin: getRodinHealth(),
           hunyuan: getHunyuanHealth(),
           fal: getFalHealth(),
+          atlas: getAtlasHealth(),
           vision: getVisionHealth(),
         },
       }
@@ -178,6 +180,7 @@ server.listen(API_PORT, API_HOST, () => {
   console.log(TRIPO_API_KEY ? 'Tripo API key loaded from environment.' : 'TRIPO_API_KEY is missing. Add it to .env.local.')
   console.log(RODIN_API_KEY ? 'Rodin API key loaded from environment.' : 'RODIN_API_KEY is missing. Add it to .env.local.')
   console.log(FAL_API_KEY ? 'Fal API key loaded from environment.' : 'FAL_API_KEY is missing. Add it to .env.local.')
+  console.log(ATLASCLOUD_API_KEY ? 'Atlas Cloud API key loaded from environment.' : 'ATLASCLOUD_API_KEY is missing. Add it to .env.local.')
   console.log(getVisionHealth().configured ? 'Vision analysis provider configured.' : 'Vision analysis is not configured. Add OPENAI_API_KEY to .env.local.')
   console.log(`Hunyuan3D local provider: ${HUNYUAN_API_BASE}`)
   logEvent('info', 'api.start', {
@@ -187,6 +190,7 @@ server.listen(API_PORT, API_HOST, () => {
       tripo: Boolean(TRIPO_API_KEY),
       rodin: Boolean(RODIN_API_KEY),
       fal: Boolean(FAL_API_KEY),
+      atlas: Boolean(ATLASCLOUD_API_KEY),
       hunyuan: Boolean(HUNYUAN_API_BASE),
       vision: getVisionHealth().configured,
     },
@@ -194,6 +198,7 @@ server.listen(API_PORT, API_HOST, () => {
 })
 
 function createGenerationTask(provider, payload) {
+  if (provider === 'atlas') return createAtlasTask(payload)
   if (provider === 'hunyuan') return createHunyuanTask(payload)
   if (provider === 'fal') return createFalTask(payload)
   if (provider === 'tripo') return createTripoTask(payload)
@@ -201,6 +206,7 @@ function createGenerationTask(provider, payload) {
 }
 
 function getGenerationTask(provider, taskId) {
+  if (provider === 'atlas') return getAtlasTask(taskId)
   if (provider === 'hunyuan') return getHunyuanTask(taskId)
   if (provider === 'fal') return getFalTask(taskId)
   if (provider === 'tripo') return getTripoTask(taskId)

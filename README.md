@@ -25,6 +25,7 @@ Open the demo video: [Demo MP4](docs/demo/3DCellForge-demo-2026-05-10.mp4)
 - Generated/imported models are restored after refresh through IndexedDB, with localStorage as a compact fallback.
 - Generic part detail drawer, asset references, comparison panel, notes, gallery actions, logs, saved projects, and a compact generation queue.
 - Hyper3D, Tripo, Fal.ai, Hunyuan3D, JS Depth, and Local GLB generation/import modes.
+- Optional Atlas Cloud Hunyuan3D image-to-3D generation with server-side credentials.
 - Cached demo GLB models for offline-friendly screenshots and demos.
 - Auxiliary Khronos glTF reference models for GLB loader and PBR material checks.
 - API key stays server-side in `.env.local`; it is never exposed to the frontend bundle.
@@ -88,6 +89,7 @@ Then set:
 ```bash
 TRIPO_API_KEY=your_tripo_key
 FAL_API_KEY=your_fal_key
+ATLASCLOUD_API_KEY=your_atlascloud_key
 RODIN_API_KEY=your_rodin_api_key
 OPENAI_API_KEY=your_openai_key
 API_HOST=127.0.0.1
@@ -107,6 +109,7 @@ The 3D generation backend supports these provider paths:
 
 ```text
 Hyper3D  Hyper3D Rodin cloud generation only (default)
+Atlas    Atlas Cloud Hunyuan3D GLB generation only
 Tripo    Tripo cloud generation only
 Fal      Fal.ai queue generation; model is selected in Settings
 Auto     Hyper3D first, then Tripo, Fal, Hunyuan, and JS Depth backup
@@ -117,6 +120,7 @@ The upload panel exposes the full generation mode choice before picking a file:
 
 ```text
 Hyper3D     Hyper3D Rodin GLB generation
+Atlas       Atlas Cloud Hunyuan3D GLB generation
 Tripo       Tripo cloud GLB generation
 Fal         Fal.ai queue GLB generation
 Hunyuan     Local Hunyuan3D GLB generation
