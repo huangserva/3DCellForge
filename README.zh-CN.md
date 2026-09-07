@@ -4,7 +4,7 @@
 
 AI 驱动的交互式 3D 模型生成、检查和演示工作台。
 
-3D Model Studio 是一个 React + Three.js 原型，用于把上传图片或 GLB 文件变成可交互的 3D 模型工作区。它支持 WebGL 拖拽旋转、滚轮缩放、左侧模型库 / 中央 3D 舞台 / 右侧工具区、截图、GLB 导出、历史上传默认收起、Demo 演示模式、生成队列，以及通过 Hyper3D / Tripo / Fal.ai / Hunyuan3D / JS Depth / 本地模型导入生成或加载 3D 模型。
+3D Model Studio 是一个 React + Three.js 原型，用于把上传图片或 GLB 文件变成可交互的 3D 模型工作区。它支持 WebGL 拖拽旋转、滚轮缩放、左侧模型库 / 中央 3D 舞台 / 右侧工具区、截图、GLB 导出、历史上传默认收起、Demo 演示模式、生成队列，以及通过 Hyper3D / Tripo / Fal.ai / Atlas Cloud / Hunyuan3D / JS Depth / 本地模型导入生成或加载 3D 模型。
 
 ## 演示视频
 
@@ -25,7 +25,7 @@ AI 驱动的交互式 3D 模型生成、检查和演示工作台。
 - 生成 / 导入成功的模型会写入 IndexedDB，刷新页面后会自动恢复；localStorage 只做轻量兜底。
 - 自定义上传记录支持删除，并同步清理相关本地数据。
 - 通用部件详情抽屉、素材参考、对比面板、模型笔记、图库操作、日志、项目保存和生成队列。
-- 支持 Hyper3D、Tripo、Fal.ai、Hunyuan3D、JS Depth 和 Local GLB 多种模式。
+- 支持 Hyper3D、Tripo、Fal.ai、Atlas Cloud、Hunyuan3D、JS Depth 和 Local GLB 多种模式。
 - 生成后的 GLB 会缓存到本地，方便后续演示和截图。
 - 内置 Khronos glTF 辅助参考模型，用于检查 GLB 加载和 PBR 材质表现。
 - API Key 只放在服务端 `.env.local`，不会暴露到前端包里。
@@ -89,6 +89,7 @@ cp .env.example .env.local
 ```bash
 TRIPO_API_KEY=your_tripo_key
 FAL_API_KEY=your_fal_key
+ATLASCLOUD_API_KEY=your_atlascloud_key
 RODIN_API_KEY=your_rodin_api_key
 OPENAI_API_KEY=your_openai_key
 API_HOST=127.0.0.1
@@ -108,6 +109,7 @@ HUNYUAN_STATUS_PATH=/status
 
 ```text
 Hyper3D  只走 Hyper3D Rodin 云端生成，默认模式
+Atlas    只走 Atlas Cloud Hunyuan3D GLB 生成
 Tripo    只走 Tripo 云端生成
 Fal      只走 Fal.ai 队列生成，具体模型在 Settings 里选择
 Auto     先 Hyper3D，再 Tripo、Fal、Hunyuan，最后 JS Depth 兜底
@@ -118,6 +120,7 @@ Hunyuan  只走本地 Hunyuan3D
 
 ```text
 Hyper3D     Hyper3D Rodin GLB 生成
+Atlas       Atlas Cloud Hunyuan3D GLB 生成
 Tripo       Tripo 云端 GLB 生成
 Fal         Fal.ai 队列 GLB 生成
 Hunyuan     本地 Hunyuan3D GLB 生成

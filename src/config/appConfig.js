@@ -52,6 +52,7 @@ export const GENERATION_PROVIDER_OPTIONS = [
   { id: 'tripo', label: 'Tripo', description: 'Cloud generation.' },
   { id: 'fal', label: 'Fal', description: 'Fal queue with selectable 3D models.' },
   { id: 'hunyuan', label: 'Hunyuan', description: 'Local Hunyuan3D server.' },
+  { id: 'atlas', label: 'Atlas Cloud', description: 'Atlas Cloud Hunyuan3D GLB generation.' },
 ]
 export const GENERATION_PROVIDER_IDS = new Set(GENERATION_PROVIDER_OPTIONS.map((provider) => provider.id))
 export const GENERATION_MODE_OPTIONS = [
@@ -59,6 +60,7 @@ export const GENERATION_MODE_OPTIONS = [
   { id: 'tripo', label: 'Tripo', description: 'Cloud GLB generation.' },
   { id: 'fal', label: 'Fal', description: 'Fal.ai queue with selectable model.' },
   { id: 'hunyuan', label: 'Hunyuan', description: 'Local Hunyuan3D GLB generation.' },
+  { id: 'atlas', label: 'Atlas Cloud', description: 'Atlas Cloud Hunyuan3D GLB generation.' },
   { id: 'cinematic', label: 'JS Depth', description: 'Browser-side image relief with layered PNG fallback.' },
   { id: 'auto', label: 'Auto', description: 'Hyper3D, Tripo, Fal, Hunyuan, then JS Depth fallback.' },
   { id: 'local', label: 'Local GLB', description: 'Import an existing GLB or GLTF file.' },
